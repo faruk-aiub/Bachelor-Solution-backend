@@ -1,0 +1,354 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  PROVIDER
+  MESS_MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  PROVIDER_ON_THE_WAY
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCESSFUL
+  FAILED
+  REFUNDED
+}
+
+enum ServiceCategory {
+  HOME_SERVICE
+  AMBULANCE
+  SUPERSHOP
+  MARKETPLACE
+  LEARNING
+  JOBS
+  MAID
+  PLUMBER
+}
+
+model User {
+  id               String    @id @default(uuid())
+  phone            String    @unique
+  email            String?   @unique
+  password         String
+  name             String?
+  profilePhoto     String?
+  gender           String?
+  occupation       String?
+  role             Role      @default(CUSTOMER)
+  
+  // Relations
+  providerProfile  Provider?
+  messProfile      MessMember?
+  bookings         Booking[]
+  orders           Order[]
+  transactions     Transaction[]
+  reviewsWritten   Review[]  @relation("ReviewAuthor")
+  notifications    Notification[]
+  jobApplications  JobApplication[]
+  listings         MarketplaceListing[]
+  housingListings  HousingListing[]
+  supportTickets   SupportTicket[]
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Provider {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id])
+  businessName   String
+  description    String?
+  logo           String?
+  isVerified     Boolean   @default(false)
+  
+  lat            Float?
+  lng            Float?
+  address        String?
+  
+  services       Service[]
+  supershop      Supershop?
+  reviews        Review[]  @relation("ProviderReviewed")
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Service {
+  id             String          @id @default(uuid())
+  providerId     String
+  provider       Provider        @relation(fields: [providerId], references: [id])
+  category       ServiceCategory
+  title          String
+  description    String?
+  basePrice      Float?
+  isActive       Boolean         @default(true)
+  
+  bookings       Booking[]
+  
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Supershop {
+  id             String    @id @default(uuid())
+  providerId     String    @unique
+  provider       Provider  @relation(fields: [providerId], references: [id])
+  shopName       String
+  address        String
+  lat            Float?
+  lng            Float?
+  
+  products       Product[]
+  orders         Order[]
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Product {
+  id             String    @id @default(uuid())
+  shopId         String
+  shop           Supershop @relation(fields: [shopId], references: [id])
+  name           String
+  description    String?
+  price          Float
+  imageUrl       String?
+  stock          Int       @default(0)
+  
+  orderItems     OrderItem[]
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Booking {
+  id             String        @id @default(uuid())
+  customerId     String
+  customer       User          @relation(fields: [customerId], references: [id])
+  serviceId      String
+  service        Service       @relation(fields: [serviceId], references: [id])
+  status         BookingStatus @default(PENDING)
+  totalAmount    Float
+  problemDetails String?
+  
+  lat            Float?
+  lng            Float?
+  address        String?
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Order {
+  id             String        @id @default(uuid())
+  customerId     String
+  customer       User          @relation(fields: [customerId], references: [id])
+  shopId         String
+  shop           Supershop     @relation(fields: [shopId], references: [id])
+  status         BookingStatus @default(PENDING)
+  totalAmount    Float
+  
+  orderItems     OrderItem[]
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model OrderItem {
+  id             String    @id @default(uuid())
+  orderId        String
+  order          Order     @relation(fields: [orderId], references: [id])
+  productId      String
+  product        Product   @relation(fields: [productId], references: [id])
+  quantity       Int
+  priceAtTime    Float
+}
+
+model Mess {
+  id             String       @id @default(uuid())
+  name           String
+  address        String
+  
+  members        MessMember[]
+  meals          Meal[]
+  expenses       MessExpense[]
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model MessMember {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id])
+  messId         String
+  mess           Mess      @relation(fields: [messId], references: [id])
+  isManager      Boolean   @default(false)
+  balance        Float     @default(0)
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Meal {
+  id             String     @id @default(uuid())
+  messId         String
+  mess           Mess       @relation(fields: [messId], references: [id])
+  date           DateTime
+  totalCount     Float
+  
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model MessExpense {
+  id             String    @id @default(uuid())
+  messId         String
+  mess           Mess      @relation(fields: [messId], references: [id])
+  amount         Float
+  description    String
+  date           DateTime  @default(now())
+}
+
+model Transaction {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  amount         Float
+  status         PaymentStatus @default(PENDING)
+  trxId          String?       @unique
+  paymentGateway String?       
+  purpose        String        
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model MarketplaceListing {
+  id             String    @id @default(uuid())
+  sellerId       String
+  seller         User      @relation(fields: [sellerId], references: [id])
+  title          String
+  description    String
+  price          Float
+  category       String    // e.g. "Furniture", "Electronics"
+  condition      String    // e.g. "Used", "New"
+  location       String
+  isSold         Boolean   @default(false)
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model JobPosting {
+  id             String    @id @default(uuid())
+  title          String
+  company        String
+  location       String
+  salary         String?
+  type           String    // e.g. "Full-time", "Internship", "Part-time"
+  requirements   String
+  deadline       DateTime?
+  
+  applications   JobApplication[]
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model JobApplication {
+  id             String     @id @default(uuid())
+  jobId          String
+  job            JobPosting @relation(fields: [jobId], references: [id])
+  applicantId    String
+  applicant      User       @relation(fields: [applicantId], references: [id])
+  status         String     @default("PENDING") // PENDING, REVIEWED, REJECTED, ACCEPTED
+  
+  createdAt      DateTime   @default(now())
+}
+
+model Review {
+  id             String    @id @default(uuid())
+  rating         Int       // 1 to 5
+  comment        String?
+  authorId       String
+  author         User      @relation("ReviewAuthor", fields: [authorId], references: [id])
+  providerId     String
+  provider       Provider  @relation("ProviderReviewed", fields: [providerId], references: [id])
+  
+  createdAt      DateTime  @default(now())
+}
+
+model Notification {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  title          String
+  message        String
+  isRead         Boolean   @default(false)
+  
+  createdAt      DateTime  @default(now())
+}
+
+// ------ NEW MODELS ADDED: HOUSING, SUPPORT, LEARNING ------
+
+model HousingListing {
+  id             String    @id @default(uuid())
+  ownerId        String
+  owner          User      @relation(fields: [ownerId], references: [id])
+  title          String
+  description    String
+  type           String    // e.g. "Sublet", "Bachelor Seat", "Hostel"
+  gender         String?   // e.g. "Male", "Female", "Any"
+  rentAmount     Float
+  location       String
+  lat            Float?
+  lng            Float?
+  facilities     String?   // JSON or comma separated
+  isAvailable    Boolean   @default(true)
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model SupportTicket {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  subject        String
+  description    String
+  status         String    @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model LearningResource {
+  id             String    @id @default(uuid())
+  title          String
+  description    String?
+  type           String    // e.g. "Course", "Notes", "Skill"
+  url            String?
+  authorName     String?
+  
+  createdAt      DateTime  @default(now())
+}
