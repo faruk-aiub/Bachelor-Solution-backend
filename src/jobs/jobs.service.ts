@@ -5,8 +5,10 @@ import { PrismaService } from '../prisma/prisma.service';
 export class JobsService {
   constructor(private prisma: PrismaService) {}
 
-  async createJobPosting(data: any) {
-    return this.prisma.jobPosting.create({ data });
+  async createJobPosting(userId: string, data: any) {
+    return this.prisma.jobPosting.create({
+      data: { ...data, posterId: userId }
+    });
   }
 
   async getAllJobs(type?: string) {
@@ -45,7 +47,28 @@ export class JobsService {
 
   async getJobById(id: string) {
     return this.prisma.jobPosting.findUnique({
-      where: { id }
+      where: { id },
+      include: { poster: { select: { name: true, profilePhoto: true } } }
+    });
+  }
+
+  async getMyPostedJobs(userId: string) {
+    return this.prisma.jobPosting.findMany({
+      where: { posterId: userId },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async updateJobPosting(userId: string, jobId: string, data: any) {
+    return this.prisma.jobPosting.updateMany({
+      where: { id: jobId, posterId: userId },
+      data
+    });
+  }
+
+  async deleteJobPosting(userId: string, jobId: string) {
+    return this.prisma.jobPosting.deleteMany({
+      where: { id: jobId, posterId: userId }
     });
   }
 }

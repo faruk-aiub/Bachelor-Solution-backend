@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -79,5 +79,22 @@ export class MessService {
         members: { include: { user: { select: { name: true, phone: true } } } }
       }
     });
+  }
+
+  async leaveMess(userId: string) {
+    const member = await this.prisma.messMember.findUnique({ where: { userId } });
+    if (!member) throw new NotFoundException('You are not in a mess');
+    if (member.isManager) throw new BadRequestException('Manager cannot leave, transfer role first');
+    return this.prisma.messMember.delete({ where: { userId } });
+  }
+
+  async removeMember(userId: string, memberIdToRemove: string) {
+    const manager = await this.prisma.messMember.findUnique({ where: { userId } });
+    if (!manager || !manager.isManager) throw new UnauthorizedException('Only manager can remove members');
+    
+    const memberToRemove = await this.prisma.messMember.findUnique({ where: { id: memberIdToRemove } });
+    if (!memberToRemove || memberToRemove.messId !== manager.messId) throw new NotFoundException('Member not found in your mess');
+    
+    return this.prisma.messMember.delete({ where: { id: memberIdToRemove } });
   }
 }

@@ -63,6 +63,7 @@ model User {
   reviewsWritten   Review[]  @relation("ReviewAuthor")
   notifications    Notification[]
   jobApplications  JobApplication[]
+  postedJobs       JobPosting[] @relation("JobPoster")
   listings         MarketplaceListing[]
   housingListings  HousingListing[]
   supportTickets   SupportTicket[]
@@ -268,6 +269,8 @@ model JobPosting {
   type           String    // e.g. "Full-time", "Internship", "Part-time"
   requirements   String
   deadline       DateTime?
+  posterId       String?
+  poster         User?     @relation("JobPoster", fields: [posterId], references: [id])
   
   applications   JobApplication[]
   

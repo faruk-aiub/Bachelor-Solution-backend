@@ -28,4 +28,11 @@ export class TransactionsService {
       }
     });
   }
+
+  async updatePaymentStatus(trxId: string, status: PaymentStatus) {
+    return this.prisma.transaction.update({
+      where: { trxId },
+      data: { status }
+    });
+  }
 }

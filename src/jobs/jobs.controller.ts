@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Body, Query, Param, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Query, Param, UseGuards, Request, UnauthorizedException, Delete } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -18,8 +18,11 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create job posting' })
   @Post()
-  createJobPosting(@Body() data: any) {
-    return this.jobsService.createJobPosting(data);
+  createJobPosting(
+    @Request() req: any,
+    @Body() data: any
+  ) {
+    return this.jobsService.createJobPosting(req.user.userId, data);
   }
 
   @ApiBearerAuth()
@@ -39,6 +42,14 @@ export class JobsController {
   @Get('my-applications')
   getMyApplications(@Request() req: any) {
     return this.jobsService.getMyApplications(req.user.userId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my posted jobs' })
+  @Get('my-jobs')
+  getMyPostedJobs(@Request() req: any) {
+    return this.jobsService.getMyPostedJobs(req.user.userId);
   }
 
   // New endpoints for employer
@@ -70,5 +81,28 @@ export class JobsController {
   @Get(':id')
   getJobById(@Param('id') id: string) {
     return this.jobsService.getJobById(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update job posting' })
+  @Patch(':id')
+  updateJobPosting(
+    @Request() req: any,
+    @Param('id') jobId: string,
+    @Body() data: any,
+  ) {
+    return this.jobsService.updateJobPosting(req.user.userId, jobId, data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete job posting' })
+  @Delete(':id')
+  deleteJobPosting(
+    @Request() req: any,
+    @Param('id') jobId: string,
+  ) {
+    return this.jobsService.deleteJobPosting(req.user.userId, jobId);
   }
 }

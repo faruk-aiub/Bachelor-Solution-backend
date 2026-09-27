@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { MessService } from './mess.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -65,5 +65,20 @@ export class MessController {
   @Get(':id')
   getMessById(@Param('id') id: string) {
     return this.messService.getMessById(id);
+  }
+
+  @ApiOperation({ summary: 'Leave mess' })
+  @Delete('leave')
+  leaveMess(@Request() req: any) {
+    return this.messService.leaveMess(req.user.userId);
+  }
+
+  @ApiOperation({ summary: 'Remove member' })
+  @Delete('member/:memberId')
+  removeMember(
+    @Request() req: any,
+    @Param('memberId') memberId: string
+  ) {
+    return this.messService.removeMember(req.user.userId, memberId);
   }
 }
