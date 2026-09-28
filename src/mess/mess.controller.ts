@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { MessService } from './mess.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -67,6 +67,25 @@ export class MessController {
     return this.messService.getMessById(id);
   }
 
+  @ApiOperation({ summary: 'Update mess details' })
+  @Patch(':id')
+  updateMess(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() data: any,
+  ) {
+    return this.messService.updateMess(req.user.userId, id, data);
+  }
+
+  @ApiOperation({ summary: 'Delete mess' })
+  @Delete(':id')
+  deleteMess(
+    @Request() req: any,
+    @Param('id') id: string,
+  ) {
+    return this.messService.deleteMess(req.user.userId, id);
+  }
+
   @ApiOperation({ summary: 'Leave mess' })
   @Delete('leave')
   leaveMess(@Request() req: any) {
@@ -80,5 +99,23 @@ export class MessController {
     @Param('memberId') memberId: string
   ) {
     return this.messService.removeMember(req.user.userId, memberId);
+  }
+
+  @ApiOperation({ summary: 'Delete meal' })
+  @Delete('meals/:id')
+  deleteMeal(
+    @Request() req: any,
+    @Param('id') mealId: string,
+  ) {
+    return this.messService.deleteMeal(req.user.userId, mealId);
+  }
+
+  @ApiOperation({ summary: 'Delete expense' })
+  @Delete('expenses/:id')
+  deleteExpense(
+    @Request() req: any,
+    @Param('id') expenseId: string,
+  ) {
+    return this.messService.deleteExpense(req.user.userId, expenseId);
   }
 }

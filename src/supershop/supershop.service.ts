@@ -54,6 +54,29 @@ export class SupershopService {
     });
   }
 
+  async getMyShop(userId: string) {
+    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    if (!provider) throw new NotFoundException('Provider profile not found');
+    return this.prisma.supershop.findUnique({ where: { providerId: provider.id } });
+  }
+
+  async updateShop(userId: string, data: any) {
+    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    if (!provider) throw new NotFoundException('Provider profile not found');
+    const shop = await this.prisma.supershop.findUnique({ where: { providerId: provider.id } });
+    if (!shop) throw new NotFoundException('Shop not found');
+    
+    return this.prisma.supershop.update({
+      where: { id: shop.id },
+      data: {
+        shopName: data.shopName,
+        address: data.address,
+        lat: data.lat,
+        lng: data.lng,
+      }
+    });
+  }
+
   async addProduct(userId: string, data: any) {
     const provider = await this.prisma.provider.findUnique({ where: { userId } });
     if (!provider) throw new NotFoundException();
@@ -88,6 +111,17 @@ export class SupershopService {
     });
   }
 
+  async getCustomerOrders(customerId: string) {
+    return this.prisma.order.findMany({
+      where: { customerId },
+      include: {
+        shop: { select: { shopName: true } },
+        orderItems: { include: { product: { select: { name: true, imageUrl: true } } } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
   async updateOrderStatus(orderId: string, userId: string, status: BookingStatus) {
     const provider = await this.prisma.provider.findUnique({ where: { userId } });
     if (!provider) throw new NotFoundException();
@@ -100,6 +134,35 @@ export class SupershopService {
     return this.prisma.order.update({
       where: { id: orderId },
       data: { status }
+    });
+  }
+
+  async updateProduct(userId: string, productId: string, data: any) {
+    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    if (!provider) throw new NotFoundException();
+    const shop = await this.prisma.supershop.findUnique({ where: { providerId: provider.id } });
+    if (!shop) throw new NotFoundException('Shop not found');
+    
+    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+    if (product?.shopId !== shop.id) throw new UnauthorizedException('Not your product');
+
+    return this.prisma.product.update({
+      where: { id: productId },
+      data
+    });
+  }
+
+  async deleteProduct(userId: string, productId: string) {
+    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    if (!provider) throw new NotFoundException();
+    const shop = await this.prisma.supershop.findUnique({ where: { providerId: provider.id } });
+    if (!shop) throw new NotFoundException('Shop not found');
+
+    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+    if (product?.shopId !== shop.id) throw new UnauthorizedException('Not your product');
+
+    return this.prisma.product.delete({
+      where: { id: productId }
     });
   }
 }

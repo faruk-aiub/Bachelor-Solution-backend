@@ -24,4 +24,17 @@ export class LearningService {
       where: { id }
     });
   }
+
+  async updateResource(id: string, data: any) {
+    return this.prisma.learningResource.update({
+      where: { id },
+      data
+    });
+  }
+
+  async deleteResource(id: string) {
+    return this.prisma.learningResource.delete({
+      where: { id }
+    });
+  }
 }

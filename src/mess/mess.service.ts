@@ -20,6 +20,31 @@ export class MessService {
     return mess;
   }
 
+  async updateMess(userId: string, messId: string, data: any) {
+    const member = await this.prisma.messMember.findUnique({ where: { userId } });
+    if (!member || member.messId !== messId) throw new UnauthorizedException('You are not in this mess');
+    if (!member.isManager) throw new UnauthorizedException('Only manager can update mess details');
+
+    return this.prisma.mess.update({
+      where: { id: messId },
+      data
+    });
+  }
+
+  async deleteMess(userId: string, messId: string) {
+    const member = await this.prisma.messMember.findUnique({ where: { userId } });
+    if (!member || member.messId !== messId) throw new UnauthorizedException('You are not in this mess');
+    if (!member.isManager) throw new UnauthorizedException('Only manager can delete mess');
+
+    // First delete all related records
+    await this.prisma.meal.deleteMany({ where: { messId } });
+    await this.prisma.messExpense.deleteMany({ where: { messId } });
+    await this.prisma.messMember.deleteMany({ where: { messId } });
+    
+    // Then delete the mess
+    return this.prisma.mess.delete({ where: { id: messId } });
+  }
+
   async joinMess(messId: string, userId: string) {
     return this.prisma.messMember.create({
       data: { userId, messId }
@@ -96,5 +121,25 @@ export class MessService {
     if (!memberToRemove || memberToRemove.messId !== manager.messId) throw new NotFoundException('Member not found in your mess');
     
     return this.prisma.messMember.delete({ where: { id: memberIdToRemove } });
+  }
+
+  async deleteMeal(userId: string, mealId: string) {
+    const member = await this.prisma.messMember.findUnique({ where: { userId } });
+    if (!member) throw new UnauthorizedException('You are not in a mess');
+
+    const meal = await this.prisma.meal.findUnique({ where: { id: mealId } });
+    if (!meal || meal.messId !== member.messId) throw new NotFoundException('Meal not found');
+
+    return this.prisma.meal.delete({ where: { id: mealId } });
+  }
+
+  async deleteExpense(userId: string, expenseId: string) {
+    const member = await this.prisma.messMember.findUnique({ where: { userId } });
+    if (!member) throw new UnauthorizedException('You are not in a mess');
+
+    const expense = await this.prisma.messExpense.findUnique({ where: { id: expenseId } });
+    if (!expense || expense.messId !== member.messId) throw new NotFoundException('Expense not found');
+
+    return this.prisma.messExpense.delete({ where: { id: expenseId } });
   }
 }

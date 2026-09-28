@@ -18,4 +18,16 @@ export class NotificationsService {
       data: { isRead: true }
     });
   }
+
+  async deleteNotification(notificationId: string, userId: string) {
+    return this.prisma.notification.deleteMany({
+      where: { id: notificationId, userId }
+    });
+  }
+
+  async clearNotifications(userId: string) {
+    return this.prisma.notification.deleteMany({
+      where: { userId }
+    });
+  }
 }

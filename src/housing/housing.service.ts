@@ -38,6 +38,13 @@ export class HousingService {
     });
   }
 
+  async updateListing(listingId: string, ownerId: string, data: any) {
+    return this.prisma.housingListing.updateMany({
+      where: { id: listingId, ownerId },
+      data
+    });
+  }
+
   async deleteListing(listingId: string, ownerId: string) {
     return this.prisma.housingListing.deleteMany({
       where: { id: listingId, ownerId }

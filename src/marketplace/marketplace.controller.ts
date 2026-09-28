@@ -49,6 +49,18 @@ export class MarketplaceController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update listing details' })
+  @Patch(':id')
+  updateListing(
+    @Request() req: any,
+    @Param('id') listingId: string,
+    @Body() data: any,
+  ) {
+    return this.marketplaceService.updateListing(listingId, req.user.userId, data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete listing' })
   @Delete(':id')
   deleteListing(

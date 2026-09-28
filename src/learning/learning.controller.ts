@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Query, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Query, Param } from '@nestjs/common';
 import { LearningService } from './learning.service';
 
 @ApiTags('Learning')
@@ -23,5 +23,17 @@ export class LearningController {
   @Get(':id')
   getResourceById(@Param('id') id: string) {
     return this.learningService.getResourceById(id);
+  }
+
+  @ApiOperation({ summary: 'Update resource' })
+  @Patch(':id')
+  updateResource(@Param('id') id: string, @Body() data: any) {
+    return this.learningService.updateResource(id, data);
+  }
+
+  @ApiOperation({ summary: 'Delete resource' })
+  @Delete(':id')
+  deleteResource(@Param('id') id: string) {
+    return this.learningService.deleteResource(id);
   }
 }

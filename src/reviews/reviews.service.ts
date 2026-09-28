@@ -33,4 +33,17 @@ export class ReviewsService {
       include: { author: { select: { name: true, profilePhoto: true } } }
     });
   }
+
+  async updateReview(id: string, authorId: string, rating: number, comment: string) {
+    return this.prisma.review.updateMany({
+      where: { id, authorId },
+      data: { rating, comment }
+    });
+  }
+
+  async deleteReview(id: string, authorId: string) {
+    return this.prisma.review.deleteMany({
+      where: { id, authorId }
+    });
+  }
 }

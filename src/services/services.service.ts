@@ -27,6 +27,16 @@ export class ServicesService {
     });
   }
 
+  async getMyServices(userId: string) {
+    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    if (!provider) throw new NotFoundException('Provider profile not found');
+
+    return this.prisma.service.findMany({
+      where: { providerId: provider.id },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
   async updateService(userId: string, serviceId: string, data: any) {
     const provider = await this.prisma.provider.findUnique({ where: { userId } });
     if (!provider) throw new NotFoundException('Provider profile not found');
@@ -45,6 +55,15 @@ export class ServicesService {
     return this.prisma.service.findUnique({
       where: { id },
       include: { provider: { select: { businessName: true, lat: true, lng: true } } }
+    });
+  }
+
+  async deleteService(userId: string, serviceId: string) {
+    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    if (!provider) throw new NotFoundException('Provider profile not found');
+
+    return this.prisma.service.deleteMany({
+      where: { id: serviceId, providerId: provider.id }
     });
   }
 }

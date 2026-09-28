@@ -44,6 +44,13 @@ export class MarketplaceService {
     });
   }
 
+  async updateListing(listingId: string, sellerId: string, data: any) {
+    return this.prisma.marketplaceListing.updateMany({
+      where: { id: listingId, sellerId },
+      data
+    });
+  }
+
   async deleteListing(listingId: string, sellerId: string) {
     return this.prisma.marketplaceListing.deleteMany({
       where: { id: listingId, sellerId }

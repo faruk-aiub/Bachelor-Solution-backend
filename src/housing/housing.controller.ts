@@ -51,6 +51,18 @@ export class HousingController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update listing details' })
+  @Patch(':id')
+  updateListing(
+    @Request() req: any,
+    @Param('id') listingId: string,
+    @Body() data: any,
+  ) {
+    return this.housingService.updateListing(listingId, req.user.userId, data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete listing' })
   @Delete(':id')
   deleteListing(

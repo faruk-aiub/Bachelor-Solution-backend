@@ -49,4 +49,15 @@ export class ProvidersService {
       }
     });
   }
+
+  async deleteProvider(userId: string) {
+    const existing = await this.prisma.provider.findUnique({ where: { userId } });
+    if (!existing) throw new NotFoundException('Provider profile not found');
+    
+    await this.prisma.user.update({ where: { id: userId }, data: { role: 'CUSTOMER' } });
+    
+    return this.prisma.provider.delete({
+      where: { userId }
+    });
+  }
 }

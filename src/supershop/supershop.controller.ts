@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Body, Param, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { SupershopService } from './supershop.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -40,6 +40,14 @@ export class SupershopController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my orders' })
+  @Get('my-orders')
+  getMyOrders(@Request() req: any) {
+    return this.supershopService.getCustomerOrders(req.user.userId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Register shop' })
   @Post('register')
   registerShop(
@@ -47,6 +55,25 @@ export class SupershopController {
     @Body() data: any,
   ) {
     return this.supershopService.registerShop(req.user.userId, data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my shop info' })
+  @Get('me')
+  getMyShop(@Request() req: any) {
+    return this.supershopService.getMyShop(req.user.userId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update shop info' })
+  @Patch('me')
+  updateShop(
+    @Request() req: any,
+    @Body() data: any,
+  ) {
+    return this.supershopService.updateShop(req.user.userId, data);
   }
 
   @ApiBearerAuth()
@@ -80,5 +107,28 @@ export class SupershopController {
     @Body('status') status: any, // BookingStatus enum
   ) {
     return this.supershopService.updateOrderStatus(orderId, req.user.userId, status);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update product' })
+  @Patch('products/:id')
+  updateProduct(
+    @Request() req: any,
+    @Param('id') productId: string,
+    @Body() data: any,
+  ) {
+    return this.supershopService.updateProduct(req.user.userId, productId, data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete product' })
+  @Delete('products/:id')
+  deleteProduct(
+    @Request() req: any,
+    @Param('id') productId: string,
+  ) {
+    return this.supershopService.deleteProduct(req.user.userId, productId);
   }
 }

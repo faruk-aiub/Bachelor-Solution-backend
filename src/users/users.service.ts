@@ -15,6 +15,15 @@ export class UsersService {
     });
   }
 
+  async getAllUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true, phone: true, email: true, name: true, 
+        gender: true, occupation: true, role: true, profilePhoto: true, createdAt: true
+      } // excluding password
+    });
+  }
+
   async updateUser(userId: string, data: any) {
     // Only allow specific fields to be updated
     const { name, gender, occupation, profilePhoto } = data;
@@ -25,6 +34,12 @@ export class UsersService {
         id: true, phone: true, email: true, name: true, 
         gender: true, occupation: true, role: true, profilePhoto: true
       }
+    });
+  }
+
+  async deleteUser(userId: string) {
+    return this.prisma.user.delete({
+      where: { id: userId }
     });
   }
 }

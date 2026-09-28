@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Query, Param, Body, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Query, Param, Body, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -32,6 +32,15 @@ export class ServicesController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my services' })
+  @Get('my-services')
+  getMyServices(@Request() req: any) {
+    if (req.user.role !== 'PROVIDER') throw new UnauthorizedException();
+    return this.servicesService.getMyServices(req.user.userId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update service' })
   @Patch(':id')
   updateService(
@@ -47,5 +56,17 @@ export class ServicesController {
   @Get(':id')
   getServiceById(@Param('id') id: string) {
     return this.servicesService.getServiceById(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Delete service' })
+  @Delete(':id')
+  deleteService(
+    @Request() req: any,
+    @Param('id') serviceId: string,
+  ) {
+    if (req.user.role !== 'PROVIDER') throw new UnauthorizedException();
+    return this.servicesService.deleteService(req.user.userId, serviceId);
   }
 }

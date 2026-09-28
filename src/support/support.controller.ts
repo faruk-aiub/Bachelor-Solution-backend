@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, UseGuards, Request, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, UseGuards, Request, Param } from '@nestjs/common';
 import { SupportService } from './support.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -30,5 +30,17 @@ export class SupportController {
   @Get(':id')
   getTicketById(@Param('id') id: string) {
     return this.supportService.getTicketById(id);
+  }
+
+  @ApiOperation({ summary: 'Resolve ticket (Admin)' })
+  @Patch(':id/resolve')
+  resolveTicket(@Param('id') id: string) {
+    return this.supportService.resolveTicket(id);
+  }
+
+  @ApiOperation({ summary: 'Delete ticket (Admin)' })
+  @Delete(':id')
+  deleteTicket(@Param('id') id: string) {
+    return this.supportService.deleteTicket(id);
   }
 }

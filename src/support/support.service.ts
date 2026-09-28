@@ -35,4 +35,10 @@ export class SupportService {
       where: { id }
     });
   }
+
+  async deleteTicket(id: string) {
+    return this.prisma.supportTicket.delete({
+      where: { id }
+    });
+  }
 }
