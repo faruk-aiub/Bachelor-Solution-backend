@@ -13,6 +13,13 @@ export class TransactionsService {
     });
   }
 
+  async getAllTransactions() {
+    return this.prisma.transaction.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { user: { select: { name: true, phone: true } } }
+    });
+  }
+
   async initiatePayment(userId: string, amount: number, purpose: string, gateway?: string) {
     // Generate a mock transaction ID for the initiation
     const trxId = 'TRX-' + Date.now() + '-' + Math.round(Math.random() * 1000);

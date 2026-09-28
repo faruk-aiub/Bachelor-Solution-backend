@@ -45,6 +45,12 @@ export class JobsService {
     });
   }
 
+  async withdrawApplication(applicationId: string, applicantId: string) {
+    return this.prisma.jobApplication.deleteMany({
+      where: { id: applicationId, applicantId }
+    });
+  }
+
   async getJobById(id: string) {
     return this.prisma.jobPosting.findUnique({
       where: { id },

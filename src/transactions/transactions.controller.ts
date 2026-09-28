@@ -16,6 +16,12 @@ export class TransactionsController {
     return this.transactionsService.getUserTransactions(req.user.userId);
   }
 
+  @ApiOperation({ summary: 'Get all transactions (Admin)' })
+  @Get('all')
+  getAllTransactions() {
+    return this.transactionsService.getAllTransactions();
+  }
+
   @ApiOperation({ summary: 'Initiate payment' })
   @Post('initiate')
   initiatePayment(

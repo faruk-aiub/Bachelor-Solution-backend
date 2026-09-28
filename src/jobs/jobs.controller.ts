@@ -77,6 +77,17 @@ export class JobsController {
     return this.jobsService.updateApplicationStatus(applicationId, status);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Withdraw job application' })
+  @Delete('applications/:id')
+  withdrawApplication(
+    @Request() req: any,
+    @Param('id') applicationId: string,
+  ) {
+    return this.jobsService.withdrawApplication(applicationId, req.user.userId);
+  }
+
   @ApiOperation({ summary: 'Get job by id' })
   @Get(':id')
   getJobById(@Param('id') id: string) {
