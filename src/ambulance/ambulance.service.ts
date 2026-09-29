@@ -51,4 +51,35 @@ export class AmbulanceService {
       }
     });
   }
+
+  async getAmbulanceById(id: string) {
+    const service = await this.prisma.service.findUnique({
+      where: { id, category: 'AMBULANCE' },
+      include: {
+        provider: {
+          include: {
+            reviews: true,
+            user: { select: { name: true, phone: true } }
+          }
+        }
+      }
+    });
+    if (!service) {
+      throw new NotFoundException('Ambulance service not found');
+    }
+    return service;
+  }
+
+  async getMyAmbulanceRequests(customerId: string) {
+    return this.prisma.booking.findMany({
+      where: {
+        customerId,
+        service: { category: 'AMBULANCE' }
+      },
+      include: {
+        service: { include: { provider: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
 }

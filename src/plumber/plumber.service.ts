@@ -31,4 +31,33 @@ export class PlumberService {
       }
     });
   }
+
+  async getPlumberById(id: string) {
+    const service = await this.prisma.service.findUnique({
+      where: { id, category: 'PLUMBER' },
+      include: {
+        provider: {
+          include: {
+            reviews: true,
+            user: { select: { name: true, phone: true } }
+          }
+        }
+      }
+    });
+    if (!service) throw new NotFoundException('Plumber service not found');
+    return service;
+  }
+
+  async getMyPlumberBookings(customerId: string) {
+    return this.prisma.booking.findMany({
+      where: {
+        customerId,
+        service: { category: 'PLUMBER' }
+      },
+      include: {
+        service: { include: { provider: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
 }

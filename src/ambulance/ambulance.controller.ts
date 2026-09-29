@@ -1,5 +1,6 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, UseGuards, Request } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AmbulanceService } from './ambulance.service';
 
 @ApiTags('Ambulance')
@@ -35,5 +36,19 @@ export class AmbulanceController {
       lng,
       address
     );
+  }
+
+  @ApiOperation({ summary: 'Get specific ambulance details' })
+  @Get(':id')
+  async getAmbulanceById(@Param('id') id: string) {
+    return this.ambulanceService.getAmbulanceById(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my ambulance requests' })
+  @Get('my-requests/all')
+  async getMyAmbulanceRequests(@Request() req: any) {
+    return this.ambulanceService.getMyAmbulanceRequests(req.user.userId);
   }
 }

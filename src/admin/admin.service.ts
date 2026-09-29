@@ -84,4 +84,13 @@ export class AdminService {
       }
     });
   }
+
+  async getAllSupportTickets() {
+    return this.prisma.supportTicket.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { name: true, phone: true, email: true } }
+      }
+    });
+  }
 }

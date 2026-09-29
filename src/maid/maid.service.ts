@@ -33,4 +33,33 @@ export class MaidService {
       }
     });
   }
+
+  async getMaidById(id: string) {
+    const service = await this.prisma.service.findUnique({
+      where: { id, category: 'MAID' },
+      include: {
+        provider: {
+          include: {
+            reviews: true,
+            user: { select: { name: true, phone: true } }
+          }
+        }
+      }
+    });
+    if (!service) throw new NotFoundException('Maid service not found');
+    return service;
+  }
+
+  async getMyMaidBookings(customerId: string) {
+    return this.prisma.booking.findMany({
+      where: {
+        customerId,
+        service: { category: 'MAID' }
+      },
+      include: {
+        service: { include: { provider: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
 }

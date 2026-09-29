@@ -52,4 +52,10 @@ export class AdminController {
   getAllProviders() {
     return this.adminService.getAllProviders();
   }
+
+  @ApiOperation({ summary: 'Get all support tickets (Admin)' })
+  @Get('support-tickets')
+  getAllSupportTickets() {
+    return this.adminService.getAllSupportTickets();
+  }
 }

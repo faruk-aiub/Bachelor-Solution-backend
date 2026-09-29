@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards, Request, Param } from '@nestjs/common';
 import { MaidService } from './maid.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -38,5 +38,19 @@ export class MaidController {
       new Date(date),
       instructions
     );
+  }
+
+  @ApiOperation({ summary: 'Get specific maid details' })
+  @Get(':id')
+  getMaidById(@Param('id') id: string) {
+    return this.maidService.getMaidById(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my maid bookings' })
+  @Get('my-bookings/all')
+  getMyMaidBookings(@Request() req: any) {
+    return this.maidService.getMyMaidBookings(req.user.userId);
   }
 }

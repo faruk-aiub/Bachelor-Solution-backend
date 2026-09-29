@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards, Request, Param } from '@nestjs/common';
 import { PlumberService } from './plumber.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -36,5 +36,19 @@ export class PlumberController {
       address,
       problemDetails
     );
+  }
+
+  @ApiOperation({ summary: 'Get specific plumber details' })
+  @Get(':id')
+  getPlumberById(@Param('id') id: string) {
+    return this.plumberService.getPlumberById(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get my plumber bookings' })
+  @Get('my-bookings/all')
+  getMyPlumberBookings(@Request() req: any) {
+    return this.plumberService.getMyPlumberBookings(req.user.userId);
   }
 }
