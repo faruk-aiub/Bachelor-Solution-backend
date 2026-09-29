@@ -61,4 +61,27 @@ export class AdminService {
       }
     });
   }
+
+  async getAllUsers() {
+    return this.prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      }
+    });
+  }
+
+  async getAllProviders() {
+    return this.prisma.provider.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { name: true, phone: true, email: true } }
+      }
+    });
+  }
 }

@@ -40,4 +40,16 @@ export class AdminController {
   getAllBookings() {
     return this.adminService.getAllBookings();
   }
+
+  @ApiOperation({ summary: 'Get all users (Admin)' })
+  @Get('users')
+  getAllUsers() {
+    return this.adminService.getAllUsers();
+  }
+
+  @ApiOperation({ summary: 'Get all providers (Admin)' })
+  @Get('providers')
+  getAllProviders() {
+    return this.adminService.getAllProviders();
+  }
 }
