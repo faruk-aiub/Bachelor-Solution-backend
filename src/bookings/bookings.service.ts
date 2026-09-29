@@ -51,4 +51,12 @@ export class BookingsService {
       include: { service: true, customer: { select: { id: true, name: true, phone: true } } }
     });
   }
+
+  async cancelBooking(id: string, customerId: string) {
+    const booking = await this.prisma.booking.findUnique({ where: { id } });
+    if (!booking || booking.customerId !== customerId) {
+      throw new Error('Booking not found or you are not authorized to cancel it');
+    }
+    return this.prisma.booking.delete({ where: { id } });
+  }
 }

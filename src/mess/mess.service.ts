@@ -142,4 +142,18 @@ export class MessService {
 
     return this.prisma.messExpense.delete({ where: { id: expenseId } });
   }
+
+  async getMeals(messId: string) {
+    return this.prisma.meal.findMany({
+      where: { messId },
+      orderBy: { date: 'desc' }
+    });
+  }
+
+  async getExpenses(messId: string) {
+    return this.prisma.messExpense.findMany({
+      where: { messId },
+      orderBy: { date: 'desc' }
+    });
+  }
 }

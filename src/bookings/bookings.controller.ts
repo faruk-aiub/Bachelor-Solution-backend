@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Delete } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -49,5 +49,14 @@ export class BookingsController {
   @Get(':id')
   getBookingById(@Param('id') id: string) {
     return this.bookingsService.getBookingById(id);
+  }
+
+  @ApiOperation({ summary: 'Cancel booking' })
+  @Delete(':id')
+  cancelBooking(
+    @Request() req: any,
+    @Param('id') id: string
+  ) {
+    return this.bookingsService.cancelBooking(id, req.user.userId);
   }
 }

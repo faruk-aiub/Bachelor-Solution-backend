@@ -61,6 +61,18 @@ export class MessController {
     return this.messService.calculateMessLedger(messId);
   }
 
+  @ApiOperation({ summary: 'Get all meals' })
+  @Get(':messId/meals')
+  getMeals(@Param('messId') messId: string) {
+    return this.messService.getMeals(messId);
+  }
+
+  @ApiOperation({ summary: 'Get all expenses' })
+  @Get(':messId/expenses')
+  getExpenses(@Param('messId') messId: string) {
+    return this.messService.getExpenses(messId);
+  }
+
   @ApiOperation({ summary: 'Get mess by id' })
   @Get(':id')
   getMessById(@Param('id') id: string) {

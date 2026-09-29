@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Query, UseGuards, Request, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards, Request, Param, Patch } from '@nestjs/common';
 import { PlumberService } from './plumber.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -50,5 +50,36 @@ export class PlumberController {
   @Get('my-bookings/all')
   getMyPlumberBookings(@Request() req: any) {
     return this.plumberService.getMyPlumberBookings(req.user.userId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get jobs for provider' })
+  @Get('provider/jobs')
+  getProviderPlumberJobs(@Request() req: any) {
+    return this.plumberService.getProviderPlumberJobs(req.user.userId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Update job status (Provider)' })
+  @Patch('provider/jobs/:id/status')
+  updateJobStatus(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body('status') status: any
+  ) {
+    return this.plumberService.updateJobStatus(id, status, req.user.userId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Toggle availability (Provider)' })
+  @Patch('provider/availability')
+  toggleAvailability(
+    @Request() req: any,
+    @Body('isActive') isActive: boolean
+  ) {
+    return this.plumberService.toggleAvailability(req.user.userId, isActive);
   }
 }

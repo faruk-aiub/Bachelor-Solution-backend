@@ -60,4 +60,49 @@ export class PlumberService {
       orderBy: { createdAt: 'desc' }
     });
   }
+
+  async getProviderPlumberJobs(userId: string) {
+    return this.prisma.booking.findMany({
+      where: {
+        service: {
+          provider: { userId },
+          category: 'PLUMBER'
+        }
+      },
+      include: {
+        customer: { select: { name: true, phone: true } },
+        service: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async updateJobStatus(bookingId: string, status: any, userId: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { service: { include: { provider: true } } }
+    });
+    if (!booking || booking.service.provider.userId !== userId) {
+      throw new NotFoundException('Booking not found or unauthorized');
+    }
+    return this.prisma.booking.update({
+      where: { id: bookingId },
+      data: { status }
+    });
+  }
+
+  async toggleAvailability(userId: string, isActive: boolean) {
+    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    if (!provider) throw new NotFoundException('Provider profile not found');
+    
+    const service = await this.prisma.service.findFirst({
+      where: { providerId: provider.id, category: 'PLUMBER' }
+    });
+    if (!service) throw new NotFoundException('Plumber service not found for this provider');
+
+    return this.prisma.service.update({
+      where: { id: service.id },
+      data: { isActive }
+    });
+  }
 }
