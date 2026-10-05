@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Body, Query, Param, UseGuards, Request, UnauthorizedException, Delete } from '@nestjs/common';
+import { Controller, Get, UseInterceptors, Post, Patch, Body, Query, Param, UseGuards, Request, UnauthorizedException, Delete } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 

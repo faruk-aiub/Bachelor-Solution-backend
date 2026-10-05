@@ -1,5 +1,6 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, UseInterceptors, Post, Patch, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -12,6 +13,8 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @ApiOperation({ summary: 'Get dashboard stats' })
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(120000) // Cache for 2 minutes
   @Get('dashboard')
   getDashboardStats() {
     return this.adminService.getDashboardStats();

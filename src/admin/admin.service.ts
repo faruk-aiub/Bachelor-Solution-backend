@@ -144,9 +144,11 @@ export class AdminService {
   async deleteJobPosting(id: string) {
     const job = await this.prisma.jobPosting.findUnique({ where: { id } });
     if (!job) throw new NotFoundException('Job not found');
-    // Delete applications first due to constraints
-    await this.prisma.jobApplication.deleteMany({ where: { jobId: id } });
-    return this.prisma.jobPosting.delete({ where: { id } });
+    
+    return this.prisma.$transaction([
+      this.prisma.jobApplication.deleteMany({ where: { jobId: id } }),
+      this.prisma.jobPosting.delete({ where: { id } })
+    ]);
   }
 
   async deleteReview(id: string) {
@@ -297,11 +299,12 @@ export class AdminService {
     const mess = await this.prisma.mess.findUnique({ where: { id } });
     if (!mess) throw new NotFoundException('Mess not found');
 
-    // Clean up relations first due to lack of cascade delete in schema
-    await this.prisma.meal.deleteMany({ where: { messId: id } });
-    await this.prisma.messExpense.deleteMany({ where: { messId: id } });
-    await this.prisma.messMember.deleteMany({ where: { messId: id } });
-    
-    return this.prisma.mess.delete({ where: { id } });
+    // Clean up relations first in a transaction
+    return this.prisma.$transaction([
+      this.prisma.meal.deleteMany({ where: { messId: id } }),
+      this.prisma.messExpense.deleteMany({ where: { messId: id } }),
+      this.prisma.messMember.deleteMany({ where: { messId: id } }),
+      this.prisma.mess.delete({ where: { id } })
+    ]);
   }
 }

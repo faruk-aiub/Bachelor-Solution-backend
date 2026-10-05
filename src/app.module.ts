@@ -25,6 +25,7 @@ import { PlumberModule } from './plumber/plumber.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { UploadsModule } from './uploads/uploads.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -33,6 +34,11 @@ import { UploadsModule } from './uploads/uploads.module';
       ttl: 60000,
       limit: 100,
     }]),
+    // In-memory caching globally
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 60000, // default ttl 60 seconds
+    }),
     PrismaModule, AuthModule, UsersModule, ProvidersModule, ServicesModule, MessModule, SupershopModule, BookingsModule, TransactionsModule, MarketplaceModule, JobsModule, ReviewsModule, NotificationsModule, HousingModule, AdminModule, SupportModule, LearningModule, AmbulanceModule, MaidModule, PlumberModule, UploadsModule
   ],
   controllers: [AppController],

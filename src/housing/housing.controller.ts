@@ -1,5 +1,6 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Body, Query, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, UseInterceptors, Post, Patch, Delete, Body, Query, Param, UseGuards, Request } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { HousingService } from './housing.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -9,6 +10,8 @@ export class HousingController {
   constructor(private readonly housingService: HousingService) {}
 
   @ApiOperation({ summary: 'Search housing' })
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000)
   @Get()
   searchHousing(
     @Query('type') type?: string,

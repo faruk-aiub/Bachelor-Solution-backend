@@ -1,5 +1,6 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request, UnauthorizedException, Query } from '@nestjs/common';
+import { Controller, Get, UseInterceptors, Post, Patch, Delete, Body, Param, UseGuards, Request, UnauthorizedException, Query } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { SupershopService } from './supershop.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -9,6 +10,7 @@ export class SupershopController {
   constructor(private readonly supershopService: SupershopService) {}
 
   @ApiOperation({ summary: 'Get nearby shops' })
+  @UseInterceptors(CacheInterceptor)
   @Get('nearby')
   getNearbyShops(
     @Query('page') page?: string,
