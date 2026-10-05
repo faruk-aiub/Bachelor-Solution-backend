@@ -11,10 +11,11 @@ export class AdminService {
     const totalBookings = await this.prisma.booking.count();
     const totalTransactions = await this.prisma.transaction.count();
     
-    const successfulTransactions = await this.prisma.transaction.findMany({
-      where: { status: 'SUCCESSFUL' }
+    const successfulTransactions = await this.prisma.transaction.aggregate({
+      where: { status: 'SUCCESSFUL' },
+      _sum: { amount: true }
     });
-    const totalRevenue = successfulTransactions.reduce((sum, trx) => sum + trx.amount, 0);
+    const totalRevenue = successfulTransactions._sum.amount || 0;
 
     return {
       totalUsers,
