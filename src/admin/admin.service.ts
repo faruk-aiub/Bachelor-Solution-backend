@@ -183,6 +183,21 @@ export class AdminService {
     return this.prisma.service.delete({ where: { id } });
   }
 
+  async deleteProduct(id: string) {
+    const product = await this.prisma.product.findUnique({ where: { id } });
+    if (!product) throw new NotFoundException('Product not found');
+    return this.prisma.product.delete({ where: { id } });
+  }
+
+  async updateProviderDetails(id: string, data: any) {
+    const provider = await this.prisma.provider.findUnique({ where: { id } });
+    if (!provider) throw new NotFoundException('Provider not found');
+    return this.prisma.provider.update({
+      where: { id },
+      data
+    });
+  }
+
   async updateBookingStatus(id: string, status: any) {
     const booking = await this.prisma.booking.findUnique({ where: { id } });
     if (!booking) throw new NotFoundException('Booking not found');

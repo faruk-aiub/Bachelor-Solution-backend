@@ -129,6 +129,21 @@ export class AdminController {
     return this.adminService.deleteService(id);
   }
 
+  @ApiOperation({ summary: 'Delete a product from supershop (Moderation)' })
+  @Delete('products/:id')
+  deleteProduct(@Param('id') id: string) {
+    return this.adminService.deleteProduct(id);
+  }
+
+  @ApiOperation({ summary: 'Update provider details manually (Admin)' })
+  @Patch('providers/:id')
+  updateProviderDetails(
+    @Param('id') id: string,
+    @Body() data: any
+  ) {
+    return this.adminService.updateProviderDetails(id, data);
+  }
+
   @ApiOperation({ summary: 'Update a booking status manually (Admin)' })
   @Patch('bookings/:id/status')
   updateBookingStatus(
