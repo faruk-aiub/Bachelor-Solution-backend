@@ -31,18 +31,34 @@ export class BookingsService {
     });
   }
 
-  async getCustomerBookings(customerId: string) {
-    return this.prisma.booking.findMany({
-      where: { customerId },
-      include: { service: true }
-    });
+  async getCustomerBookings(customerId: string, page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        where: { customerId },
+        include: { service: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.booking.count({ where: { customerId } })
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getProviderBookings(providerId: string) {
-    return this.prisma.booking.findMany({
-      where: { service: { providerId } },
-      include: { customer: true }
-    });
+  async getProviderBookings(providerId: string, page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        where: { service: { providerId } },
+        include: { customer: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.booking.count({ where: { service: { providerId } } })
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async getBookingById(id: string) {

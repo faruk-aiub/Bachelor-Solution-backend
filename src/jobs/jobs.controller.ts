@@ -10,8 +10,14 @@ export class JobsController {
 
   @ApiOperation({ summary: 'Get all jobs' })
   @Get()
-  getAllJobs(@Query('type') type?: string) {
-    return this.jobsService.getAllJobs(type);
+  getAllJobs(
+    @Query('type') type?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.jobsService.getAllJobs(type, pageNum, limitNum);
   }
 
   @ApiBearerAuth()
@@ -48,8 +54,14 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get my posted jobs' })
   @Get('my-jobs')
-  getMyPostedJobs(@Request() req: any) {
-    return this.jobsService.getMyPostedJobs(req.user.userId);
+  getMyPostedJobs(
+    @Request() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.jobsService.getMyPostedJobs(req.user.userId, pageNum, limitNum);
   }
 
   // New endpoints for employer

@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request, UnauthorizedException, Query } from '@nestjs/common';
 import { SupershopService } from './supershop.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -10,14 +10,25 @@ export class SupershopController {
 
   @ApiOperation({ summary: 'Get nearby shops' })
   @Get('nearby')
-  getNearbyShops() {
-    return this.supershopService.getNearbyShops();
+  getNearbyShops(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.supershopService.getNearbyShops(pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Get products' })
   @Get(':shopId/products')
-  getProducts(@Param('shopId') shopId: string) {
-    return this.supershopService.getShopProducts(shopId);
+  getProducts(
+    @Param('shopId') shopId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.supershopService.getShopProducts(shopId, pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Get single product' })
@@ -42,8 +53,25 @@ export class SupershopController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get my orders' })
   @Get('my-orders')
-  getMyOrders(@Request() req: any) {
-    return this.supershopService.getCustomerOrders(req.user.userId);
+  getMyOrders(
+    @Request() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.supershopService.getCustomerOrders(req.user.userId, pageNum, limitNum);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Cancel my pending order' })
+  @Delete('my-orders/:id')
+  cancelMyOrder(
+    @Request() req: any,
+    @Param('id') orderId: string,
+  ) {
+    return this.supershopService.cancelCustomerOrder(orderId, req.user.userId);
   }
 
   @ApiBearerAuth()
@@ -92,9 +120,15 @@ export class SupershopController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get shop orders' })
   @Get('orders')
-  getShopOrders(@Request() req: any) {
+  getShopOrders(
+    @Request() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
     if (req.user.role !== 'PROVIDER') throw new UnauthorizedException('Only providers can view orders');
-    return this.supershopService.getShopOrders(req.user.userId);
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.supershopService.getShopOrders(req.user.userId, pageNum, limitNum);
   }
 
   @ApiBearerAuth()

@@ -70,6 +70,9 @@ model User {
   
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+
+  @@index([phone])
+  @@index([role])
 }
 
 model Provider {
@@ -91,6 +94,8 @@ model Provider {
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@index([isVerified])
 }
 
 model Service {
@@ -107,6 +112,9 @@ model Service {
   
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+
+  @@index([category])
+  @@index([isActive])
 }
 
 model Supershop {
@@ -123,6 +131,8 @@ model Supershop {
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@index([lat, lng])
 }
 
 model Product {
@@ -139,6 +149,8 @@ model Product {
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@index([shopId])
 }
 
 model Booking {
@@ -157,6 +169,10 @@ model Booking {
   
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+
+  @@index([customerId])
+  @@index([serviceId])
+  @@index([status])
 }
 
 model Order {
@@ -172,6 +188,10 @@ model Order {
   
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+
+  @@index([customerId])
+  @@index([shopId])
+  @@index([status])
 }
 
 model OrderItem {
@@ -182,6 +202,9 @@ model OrderItem {
   product        Product   @relation(fields: [productId], references: [id])
   quantity       Int
   priceAtTime    Float
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Mess {
@@ -242,6 +265,9 @@ model Transaction {
   
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([status])
 }
 
 model MarketplaceListing {
@@ -258,6 +284,10 @@ model MarketplaceListing {
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@index([category])
+  @@index([location])
+  @@index([isSold])
 }
 
 model JobPosting {
@@ -276,6 +306,9 @@ model JobPosting {
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@index([type])
+  @@index([location])
 }
 
 model JobApplication {
@@ -299,6 +332,8 @@ model Review {
   provider       Provider  @relation("ProviderReviewed", fields: [providerId], references: [id])
   
   createdAt      DateTime  @default(now())
+
+  @@index([providerId])
 }
 
 model Notification {
@@ -310,6 +345,9 @@ model Notification {
   isRead         Boolean   @default(false)
   
   createdAt      DateTime  @default(now())
+
+  @@index([userId])
+  @@index([isRead])
 }
 
 // ------ NEW MODELS ADDED: HOUSING, SUPPORT, LEARNING ------
@@ -331,6 +369,11 @@ model HousingListing {
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@index([type])
+  @@index([location])
+  @@index([gender])
+  @@index([isAvailable])
 }
 
 model SupportTicket {
@@ -343,6 +386,9 @@ model SupportTicket {
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
 }
 
 model LearningResource {

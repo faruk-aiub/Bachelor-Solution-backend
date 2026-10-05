@@ -13,16 +13,26 @@ export class MarketplaceController {
   searchItems(
     @Query('category') category?: string,
     @Query('location') location?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
-    return this.marketplaceService.searchListings(category, location);
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.marketplaceService.searchListings(category, location, pageNum, limitNum);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get my listings' })
   @Get('my-listings')
-  getMyListings(@Request() req: any) {
-    return this.marketplaceService.getMyListings(req.user.userId);
+  getMyListings(
+    @Request() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.marketplaceService.getMyListings(req.user.userId, pageNum, limitNum);
   }
 
   @ApiBearerAuth()

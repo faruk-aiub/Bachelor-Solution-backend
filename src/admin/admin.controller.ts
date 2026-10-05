@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -37,26 +37,46 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Get all bookings (Admin)' })
   @Get('bookings')
-  getAllBookings() {
-    return this.adminService.getAllBookings();
+  getAllBookings(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.adminService.getAllBookings(pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Get all users (Admin)' })
   @Get('users')
-  getAllUsers() {
-    return this.adminService.getAllUsers();
+  getAllUsers(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.adminService.getAllUsers(pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Get all providers (Admin)' })
   @Get('providers')
-  getAllProviders() {
-    return this.adminService.getAllProviders();
+  getAllProviders(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.adminService.getAllProviders(pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Get all support tickets (Admin)' })
   @Get('support-tickets')
-  getAllSupportTickets() {
-    return this.adminService.getAllSupportTickets();
+  getAllSupportTickets(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.adminService.getAllSupportTickets(pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Delete a housing listing (Moderation)' })
@@ -101,8 +121,13 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Get all transactions (Admin)' })
   @Get('transactions')
-  getAllTransactions() {
-    return this.adminService.getAllTransactions();
+  getAllTransactions(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.adminService.getAllTransactions(pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Update support ticket status (Admin)' })
@@ -164,8 +189,13 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Get all supershop orders' })
   @Get('orders')
-  getAllOrders() {
-    return this.adminService.getAllOrders();
+  getAllOrders(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.adminService.getAllOrders(pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Broadcast a notification to all users' })

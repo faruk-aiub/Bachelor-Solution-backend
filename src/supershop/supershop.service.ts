@@ -6,14 +6,30 @@ import { BookingStatus } from '@prisma/client';
 export class SupershopService {
   constructor(private prisma: PrismaService) {}
 
-  async getNearbyShops() {
-    return this.prisma.supershop.findMany({
-      include: { provider: { select: { businessName: true } } }
-    });
+  async getNearbyShops(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.supershop.findMany({
+        include: { provider: { select: { businessName: true } } },
+        skip,
+        take: limit,
+      }),
+      this.prisma.supershop.count()
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getShopProducts(shopId: string) {
-    return this.prisma.product.findMany({ where: { shopId } });
+  async getShopProducts(shopId: string, page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where: { shopId },
+        skip,
+        take: limit,
+      }),
+      this.prisma.product.count({ where: { shopId } })
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async getProductById(productId: string) {
@@ -95,31 +111,45 @@ export class SupershopService {
     });
   }
 
-  async getShopOrders(userId: string) {
+  async getShopOrders(userId: string, page: number = 1, limit: number = 20) {
     const provider = await this.prisma.provider.findUnique({ where: { userId } });
     if (!provider) throw new NotFoundException();
     const shop = await this.prisma.supershop.findUnique({ where: { providerId: provider.id } });
     if (!shop) throw new NotFoundException('Shop not found');
 
-    return this.prisma.order.findMany({
-      where: { shopId: shop.id },
-      include: {
-        customer: { select: { name: true, phone: true } },
-        orderItems: { include: { product: { select: { name: true } } } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where: { shopId: shop.id },
+        include: {
+          customer: { select: { name: true, phone: true } },
+          orderItems: { include: { product: { select: { name: true } } } }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.order.count({ where: { shopId: shop.id } })
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getCustomerOrders(customerId: string) {
-    return this.prisma.order.findMany({
-      where: { customerId },
-      include: {
-        shop: { select: { shopName: true } },
-        orderItems: { include: { product: { select: { name: true, imageUrl: true } } } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+  async getCustomerOrders(customerId: string, page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where: { customerId },
+        include: {
+          shop: { select: { shopName: true } },
+          orderItems: { include: { product: { select: { name: true, imageUrl: true } } } }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.order.count({ where: { customerId } })
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async updateOrderStatus(orderId: string, userId: string, status: BookingStatus) {
@@ -134,6 +164,20 @@ export class SupershopService {
     return this.prisma.order.update({
       where: { id: orderId },
       data: { status }
+    });
+  }
+
+  async cancelCustomerOrder(orderId: string, customerId: string) {
+    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    if (!order) throw new NotFoundException('Order not found');
+    if (order.customerId !== customerId) throw new UnauthorizedException('Not your order');
+    if (order.status !== BookingStatus.PENDING) {
+      throw new UnauthorizedException('Cannot cancel order after it has been accepted or processed');
+    }
+
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: { status: BookingStatus.CANCELLED }
     });
   }
 

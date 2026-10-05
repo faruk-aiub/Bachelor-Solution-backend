@@ -57,4 +57,26 @@ export class AuthService {
 
     return { success: true, message: 'Password updated successfully' };
   }
+
+  async verifyOtp(phone: string, otp: string) {
+    // In a real app, verify OTP with Redis or Database
+    // For now, assume OTP is 1234 or mock successful validation
+    if (otp !== '1234') {
+      throw new UnauthorizedException('Invalid OTP');
+    }
+    return { success: true, message: 'OTP verified successfully' };
+  }
+
+  async resetPassword(phone: string, newPass: string) {
+    const user = await this.prisma.user.findUnique({ where: { phone } });
+    if (!user) throw new NotFoundException('User not found');
+
+    const hashedNewPassword = await bcrypt.hash(newPass, 10);
+    await this.prisma.user.update({
+      where: { phone },
+      data: { password: hashedNewPassword }
+    });
+
+    return { success: true, message: 'Password reset successfully' };
+  }
 }

@@ -14,16 +14,26 @@ export class HousingController {
     @Query('type') type?: string,
     @Query('location') location?: string,
     @Query('maxRent') maxRent?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
-    return this.housingService.searchHousing(type, location, maxRent ? parseFloat(maxRent) : undefined);
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.housingService.searchHousing(type, location, maxRent ? parseFloat(maxRent) : undefined, pageNum, limitNum);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get my listings' })
   @Get('my-listings')
-  getMyListings(@Request() req: any) {
-    return this.housingService.getMyListings(req.user.userId);
+  getMyListings(
+    @Request() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.housingService.getMyListings(req.user.userId, pageNum, limitNum);
   }
 
   @ApiBearerAuth()

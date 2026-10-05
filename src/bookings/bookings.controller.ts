@@ -1,5 +1,5 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Delete, Query } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -25,15 +25,27 @@ export class BookingsController {
 
   @ApiOperation({ summary: 'Get customer bookings' })
   @Get('customer')
-  getCustomerBookings(@Request() req: any) {
-    return this.bookingsService.getCustomerBookings(req.user.userId);
+  getCustomerBookings(
+    @Request() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
+    return this.bookingsService.getCustomerBookings(req.user.userId, pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Get provider bookings' })
   @Get('provider')
-  getProviderBookings(@Request() req: any) {
+  getProviderBookings(
+    @Request() req: any,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const pageNum = page ? parseInt(page) : 1;
+    const limitNum = limit ? parseInt(limit) : 20;
     // Requires provider ID, simplified here assuming userId is providerId
-    return this.bookingsService.getProviderBookings(req.user.userId);
+    return this.bookingsService.getProviderBookings(req.user.userId, pageNum, limitNum);
   }
 
   @ApiOperation({ summary: 'Update status' })

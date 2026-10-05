@@ -11,11 +11,20 @@ export class JobsService {
     });
   }
 
-  async getAllJobs(type?: string) {
-    return this.prisma.jobPosting.findMany({
-      where: { type: type ? type : undefined, deadline: { gte: new Date() } },
-      orderBy: { createdAt: 'desc' }
-    });
+  async getAllJobs(type?: string, page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.jobPosting.findMany({
+        where: { type: type ? type : undefined, deadline: { gte: new Date() } },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.jobPosting.count({
+        where: { type: type ? type : undefined, deadline: { gte: new Date() } }
+      })
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async applyForJob(jobId: string, applicantId: string) {
@@ -58,11 +67,18 @@ export class JobsService {
     });
   }
 
-  async getMyPostedJobs(userId: string) {
-    return this.prisma.jobPosting.findMany({
-      where: { posterId: userId },
-      orderBy: { createdAt: 'desc' }
-    });
+  async getMyPostedJobs(userId: string, page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.jobPosting.findMany({
+        where: { posterId: userId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.jobPosting.count({ where: { posterId: userId } })
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async updateJobPosting(userId: string, jobId: string, data: any) {

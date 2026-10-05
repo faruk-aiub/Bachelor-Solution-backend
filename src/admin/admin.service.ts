@@ -49,55 +49,83 @@ export class AdminService {
     });
   }
 
-  async getAllBookings() {
-    return this.prisma.booking.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        customer: { select: { name: true, phone: true } },
-        service: { 
-          select: { 
-            provider: { 
-              select: { 
-                businessName: true, 
-                user: { select: { phone: true } } 
+  async getAllBookings(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          customer: { select: { name: true, phone: true } },
+          service: { 
+            select: { 
+              provider: { 
+                select: { 
+                  businessName: true, 
+                  user: { select: { phone: true } } 
+                } 
               } 
             } 
-          } 
-        }
-      }
-    });
+          }
+        },
+        skip,
+        take: limit
+      }),
+      this.prisma.booking.count()
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getAllUsers() {
-    return this.prisma.user.findMany({
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        phone: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      }
-    });
+  async getAllUsers(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.user.findMany({
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+          role: true,
+          createdAt: true,
+        },
+        skip,
+        take: limit
+      }),
+      this.prisma.user.count()
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getAllProviders() {
-    return this.prisma.provider.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: { select: { name: true, phone: true, email: true } }
-      }
-    });
+  async getAllProviders(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.provider.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: { select: { name: true, phone: true, email: true } }
+        },
+        skip,
+        take: limit
+      }),
+      this.prisma.provider.count()
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getAllSupportTickets() {
-    return this.prisma.supportTicket.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: { select: { name: true, phone: true, email: true } }
-      }
-    });
+  async getAllSupportTickets(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.supportTicket.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: { select: { name: true, phone: true, email: true } }
+        },
+        skip,
+        take: limit
+      }),
+      this.prisma.supportTicket.count()
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   // --- Content Moderation ---
@@ -148,13 +176,20 @@ export class AdminService {
     });
   }
 
-  async getAllTransactions() {
-    return this.prisma.transaction.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: { select: { name: true, phone: true } }
-      }
-    });
+  async getAllTransactions(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.transaction.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: { select: { name: true, phone: true } }
+        },
+        skip,
+        take: limit
+      }),
+      this.prisma.transaction.count()
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async updateSupportTicketStatus(ticketId: string, status: string) {
@@ -216,14 +251,21 @@ export class AdminService {
     });
   }
 
-  async getAllOrders() {
-    return this.prisma.order.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        customer: { select: { name: true, phone: true } },
-        shop: { select: { shopName: true } }
-      }
-    });
+  async getAllOrders(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          customer: { select: { name: true, phone: true } },
+          shop: { select: { shopName: true } }
+        },
+        skip,
+        take: limit
+      }),
+      this.prisma.order.count()
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async broadcastNotification(title: string, message: string) {

@@ -31,4 +31,22 @@ export class AuthController {
   ) {
     return this.authService.changePassword(req.user.userId, oldPassword, newPassword);
   }
+
+  @ApiOperation({ summary: 'Verify OTP' })
+  @Post('verify-otp')
+  verifyOtp(
+    @Body('phone') phone: string,
+    @Body('otp') otp: string
+  ) {
+    return this.authService.verifyOtp(phone, otp);
+  }
+
+  @ApiOperation({ summary: 'Reset password (Forgot Password)' })
+  @Patch('reset-password')
+  resetPassword(
+    @Body('phone') phone: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    return this.authService.resetPassword(phone, newPassword);
+  }
 }
