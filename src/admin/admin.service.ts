@@ -138,6 +138,69 @@ export class AdminService {
     });
   }
   // --- Additional Admin Features ---
+  async updateUserRole(userId: string, role: any) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { role }
+    });
+  }
+
+  async getAllTransactions() {
+    return this.prisma.transaction.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { name: true, phone: true } }
+      }
+    });
+  }
+
+  async updateSupportTicketStatus(ticketId: string, status: string) {
+    const ticket = await this.prisma.supportTicket.findUnique({ where: { id: ticketId } });
+    if (!ticket) throw new NotFoundException('Support ticket not found');
+
+    return this.prisma.supportTicket.update({
+      where: { id: ticketId },
+      data: { status }
+    });
+  }
+
+  async updateTransactionStatus(id: string, status: any) {
+    const transaction = await this.prisma.transaction.findUnique({ where: { id } });
+    if (!transaction) throw new NotFoundException('Transaction not found');
+    
+    return this.prisma.transaction.update({
+      where: { id },
+      data: { status }
+    });
+  }
+
+  async deleteService(id: string) {
+    const service = await this.prisma.service.findUnique({ where: { id } });
+    if (!service) throw new NotFoundException('Service not found');
+    return this.prisma.service.delete({ where: { id } });
+  }
+
+  async updateBookingStatus(id: string, status: any) {
+    const booking = await this.prisma.booking.findUnique({ where: { id } });
+    if (!booking) throw new NotFoundException('Booking not found');
+    return this.prisma.booking.update({
+      where: { id },
+      data: { status }
+    });
+  }
+
+  async updateOrderStatus(id: string, status: any) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException('Order not found');
+    return this.prisma.order.update({
+      where: { id },
+      data: { status }
+    });
+  }
+
   async getAllOrders() {
     return this.prisma.order.findMany({
       orderBy: { createdAt: 'desc' },

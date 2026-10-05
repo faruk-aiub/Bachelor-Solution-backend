@@ -89,6 +89,64 @@ export class AdminController {
     return this.adminService.refundTransaction(id);
   }
 
+  @ApiOperation({ summary: 'Update user role (Admin)' })
+  @Patch('users/:id/role')
+  updateUserRole(
+    @Param('id') id: string,
+    @Body('role') role: string
+  ) {
+    // Assuming role comes as a valid string value for the Role enum
+    return this.adminService.updateUserRole(id, role as any);
+  }
+
+  @ApiOperation({ summary: 'Get all transactions (Admin)' })
+  @Get('transactions')
+  getAllTransactions() {
+    return this.adminService.getAllTransactions();
+  }
+
+  @ApiOperation({ summary: 'Update support ticket status (Admin)' })
+  @Patch('support-tickets/:id/status')
+  updateSupportTicketStatus(
+    @Param('id') id: string,
+    @Body('status') status: string
+  ) {
+    return this.adminService.updateSupportTicketStatus(id, status);
+  }
+
+  @ApiOperation({ summary: 'Update transaction status manually (Admin)' })
+  @Patch('transactions/:id/status')
+  updateTransactionStatus(
+    @Param('id') id: string,
+    @Body('status') status: string
+  ) {
+    return this.adminService.updateTransactionStatus(id, status as any);
+  }
+
+  @ApiOperation({ summary: 'Delete a generic service (Moderation)' })
+  @Delete('services/:id')
+  deleteService(@Param('id') id: string) {
+    return this.adminService.deleteService(id);
+  }
+
+  @ApiOperation({ summary: 'Update a booking status manually (Admin)' })
+  @Patch('bookings/:id/status')
+  updateBookingStatus(
+    @Param('id') id: string,
+    @Body('status') status: string
+  ) {
+    return this.adminService.updateBookingStatus(id, status as any);
+  }
+
+  @ApiOperation({ summary: 'Update a supershop order status manually (Admin)' })
+  @Patch('orders/:id/status')
+  updateOrderStatus(
+    @Param('id') id: string,
+    @Body('status') status: string
+  ) {
+    return this.adminService.updateOrderStatus(id, status as any);
+  }
+
   @ApiOperation({ summary: 'Get all supershop orders' })
   @Get('orders')
   getAllOrders() {
