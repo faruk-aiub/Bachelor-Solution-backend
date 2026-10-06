@@ -1,5 +1,18 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Query, UseGuards, Request, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  UseGuards,
+  Request,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+} from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { MarketplaceService } from './marketplace.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -9,6 +22,7 @@ export class MarketplaceController {
   constructor(private readonly marketplaceService: MarketplaceService) {}
 
   @ApiOperation({ summary: 'Search items' })
+  @UseInterceptors(CacheInterceptor)
   @Get()
   searchItems(
     @Query('category') category?: string,
@@ -18,7 +32,12 @@ export class MarketplaceController {
   ) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
-    return this.marketplaceService.searchListings(category, location, pageNum, limitNum);
+    return this.marketplaceService.searchListings(
+      category,
+      location,
+      pageNum,
+      limitNum,
+    );
   }
 
   @ApiBearerAuth()
@@ -32,17 +51,18 @@ export class MarketplaceController {
   ) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
-    return this.marketplaceService.getMyListings(req.user.userId, pageNum, limitNum);
+    return this.marketplaceService.getMyListings(
+      req.user.userId,
+      pageNum,
+      limitNum,
+    );
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create listing' })
   @Post()
-  createListing(
-    @Request() req: any,
-    @Body() data: any,
-  ) {
+  createListing(@Request() req: any, @Body() data: any) {
     return this.marketplaceService.createListing(req.user.userId, data);
   }
 
@@ -50,10 +70,7 @@ export class MarketplaceController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Mark as sold' })
   @Patch(':id/sold')
-  markAsSold(
-    @Request() req: any,
-    @Param('id') listingId: string,
-  ) {
+  markAsSold(@Request() req: any, @Param('id') listingId: string) {
     return this.marketplaceService.markAsSold(listingId, req.user.userId);
   }
 
@@ -66,17 +83,18 @@ export class MarketplaceController {
     @Param('id') listingId: string,
     @Body() data: any,
   ) {
-    return this.marketplaceService.updateListing(listingId, req.user.userId, data);
+    return this.marketplaceService.updateListing(
+      listingId,
+      req.user.userId,
+      data,
+    );
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete listing' })
   @Delete(':id')
-  deleteListing(
-    @Request() req: any,
-    @Param('id') listingId: string,
-  ) {
+  deleteListing(@Request() req: any, @Param('id') listingId: string) {
     return this.marketplaceService.deleteListing(listingId, req.user.userId);
   }
 

@@ -1,12 +1,21 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Notifications')
 @Controller('api/v1/notifications')
 @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
@@ -36,10 +45,10 @@ export class NotificationsController {
 
   @ApiOperation({ summary: 'Delete a single notification' })
   @Delete(':id')
-  deleteNotification(
-    @Request() req: any,
-    @Param('id') notificationId: string,
-  ) {
-    return this.notificationsService.deleteNotification(notificationId, req.user.userId);
+  deleteNotification(@Request() req: any, @Param('id') notificationId: string) {
+    return this.notificationsService.deleteNotification(
+      notificationId,
+      req.user.userId,
+    );
   }
 }

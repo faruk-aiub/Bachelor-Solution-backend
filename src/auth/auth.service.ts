@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -7,7 +11,7 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(
     private prisma: PrismaService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async register(data: any) {
@@ -17,8 +21,8 @@ export class AuthService {
         phone: data.phone,
         password: hashedPassword,
         name: data.name,
-        role: data.role || 'CUSTOMER'
-      }
+        role: data.role || 'CUSTOMER',
+      },
     });
 
     return this.generateToken(user);
@@ -38,7 +42,12 @@ export class AuthService {
     const payload = { sub: user.id, phone: user.phone, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
-      user: { id: user.id, phone: user.phone, name: user.name, role: user.role }
+      user: {
+        id: user.id,
+        phone: user.phone,
+        name: user.name,
+        role: user.role,
+      },
     };
   }
 
@@ -52,7 +61,7 @@ export class AuthService {
     const hashedNewPassword = await bcrypt.hash(newPass, 10);
     await this.prisma.user.update({
       where: { id: userId },
-      data: { password: hashedNewPassword }
+      data: { password: hashedNewPassword },
     });
 
     return { success: true, message: 'Password updated successfully' };
@@ -74,7 +83,7 @@ export class AuthService {
     const hashedNewPassword = await bcrypt.hash(newPass, 10);
     await this.prisma.user.update({
       where: { phone },
-      data: { password: hashedNewPassword }
+      data: { password: hashedNewPassword },
     });
 
     return { success: true, message: 'Password reset successfully' };

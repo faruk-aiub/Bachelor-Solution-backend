@@ -14,35 +14,51 @@ export class MarketplaceService {
         price: data.price,
         category: data.category,
         condition: data.condition,
-        location: data.location
-      }
+        location: data.location,
+      },
     });
   }
 
-  async searchListings(category?: string, location?: string, page: number = 1, limit: number = 20) {
+  async searchListings(
+    category?: string,
+    location?: string,
+    page: number = 1,
+    limit: number = 20,
+  ) {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
       this.prisma.marketplaceListing.findMany({
-      where: {
-        isSold: false,
-        category: category ? { equals: category, mode: 'insensitive' } : undefined,
-        location: location ? { contains: location, mode: 'insensitive' } : undefined,
-      },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: limit,
-    }),
-    this.prisma.marketplaceListing.count({
-      where: {
-        isSold: false,
-        category: category ? { equals: category, mode: 'insensitive' } : undefined,
-        location: location ? { contains: location, mode: 'insensitive' } : undefined,
-      }
-    })
+        where: {
+          isSold: false,
+          category: category
+            ? { equals: category, mode: 'insensitive' }
+            : undefined,
+          location: location
+            ? { contains: location, mode: 'insensitive' }
+            : undefined,
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.marketplaceListing.count({
+        where: {
+          isSold: false,
+          category: category
+            ? { equals: category, mode: 'insensitive' }
+            : undefined,
+          location: location
+            ? { contains: location, mode: 'insensitive' }
+            : undefined,
+        },
+      }),
     ]);
 
-    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async getMyListings(userId: string, page: number = 1, limit: number = 20) {
@@ -55,36 +71,39 @@ export class MarketplaceService {
         skip,
         take: limit,
       }),
-      this.prisma.marketplaceListing.count({ where: { sellerId: userId } })
+      this.prisma.marketplaceListing.count({ where: { sellerId: userId } }),
     ]);
 
-    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async markAsSold(listingId: string, sellerId: string) {
     return this.prisma.marketplaceListing.updateMany({
       where: { id: listingId, sellerId },
-      data: { isSold: true }
+      data: { isSold: true },
     });
   }
 
   async updateListing(listingId: string, sellerId: string, data: any) {
     return this.prisma.marketplaceListing.updateMany({
       where: { id: listingId, sellerId },
-      data
+      data,
     });
   }
 
   async deleteListing(listingId: string, sellerId: string) {
     return this.prisma.marketplaceListing.deleteMany({
-      where: { id: listingId, sellerId }
+      where: { id: listingId, sellerId },
     });
   }
 
   async getListingById(id: string) {
     return this.prisma.marketplaceListing.findUnique({
       where: { id },
-      include: { seller: { select: { name: true, phone: true } } }
+      include: { seller: { select: { name: true, phone: true } } },
     });
   }
 }

@@ -7,7 +7,7 @@ export class AppService {
       name: 'Bachelor Solution API',
       version: '1.0.0',
       status: '🚀 Running perfectly!',
-      docs: '/api-docs'
+      docs: '/api-docs',
     };
   }
 }

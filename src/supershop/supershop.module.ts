@@ -4,6 +4,6 @@ import { SupershopController } from './supershop.controller';
 
 @Module({
   providers: [SupershopService],
-  controllers: [SupershopController]
+  controllers: [SupershopController],
 })
 export class SupershopModule {}

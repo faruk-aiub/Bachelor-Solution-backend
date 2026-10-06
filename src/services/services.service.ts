@@ -8,12 +8,16 @@ export class ServicesService {
   async searchServices(category?: string, lat?: string, lng?: string) {
     return this.prisma.service.findMany({
       where: { category: category as any, isActive: true },
-      include: { provider: { select: { businessName: true, lat: true, lng: true } } }
+      include: {
+        provider: { select: { businessName: true, lat: true, lng: true } },
+      },
     });
   }
 
   async addService(userId: string, data: any) {
-    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    const provider = await this.prisma.provider.findUnique({
+      where: { userId },
+    });
     if (!provider) throw new NotFoundException('Provider profile not found');
 
     return this.prisma.service.create({
@@ -22,23 +26,27 @@ export class ServicesService {
         category: data.category,
         title: data.title,
         description: data.description,
-        basePrice: data.basePrice
-      }
+        basePrice: data.basePrice,
+      },
     });
   }
 
   async getMyServices(userId: string) {
-    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    const provider = await this.prisma.provider.findUnique({
+      where: { userId },
+    });
     if (!provider) throw new NotFoundException('Provider profile not found');
 
     return this.prisma.service.findMany({
       where: { providerId: provider.id },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async updateService(userId: string, serviceId: string, data: any) {
-    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    const provider = await this.prisma.provider.findUnique({
+      where: { userId },
+    });
     if (!provider) throw new NotFoundException('Provider profile not found');
 
     return this.prisma.service.updateMany({
@@ -46,24 +54,28 @@ export class ServicesService {
       data: {
         basePrice: data.basePrice,
         description: data.description,
-        isActive: data.isActive
-      }
+        isActive: data.isActive,
+      },
     });
   }
 
   async getServiceById(id: string) {
     return this.prisma.service.findUnique({
       where: { id },
-      include: { provider: { select: { businessName: true, lat: true, lng: true } } }
+      include: {
+        provider: { select: { businessName: true, lat: true, lng: true } },
+      },
     });
   }
 
   async deleteService(userId: string, serviceId: string) {
-    const provider = await this.prisma.provider.findUnique({ where: { userId } });
+    const provider = await this.prisma.provider.findUnique({
+      where: { userId },
+    });
     if (!provider) throw new NotFoundException('Provider profile not found');
 
     return this.prisma.service.deleteMany({
-      where: { id: serviceId, providerId: provider.id }
+      where: { id: serviceId, providerId: provider.id },
     });
   }
 }

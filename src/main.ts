@@ -24,7 +24,7 @@ async function bootstrap() {
 
   // 3. CORS: Restrict API access to specific domains
   app.enableCors({
-    origin: '*', 
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -44,7 +44,9 @@ async function bootstrap() {
   // 6. Swagger API Documentation
   const config = new DocumentBuilder()
     .setTitle('Bachelor Solution API')
-    .setDescription('The complete API documentation for Bachelor Solution Platform')
+    .setDescription(
+      'The complete API documentation for Bachelor Solution Platform',
+    )
     .setVersion('1.0')
     .addBearerAuth() // Adds the Authorize button for JWT tokens
     .build();

@@ -11,9 +11,10 @@ export class AmbulanceService {
     return this.prisma.$queryRaw`
       SELECT 
         s.id as "serviceId", s.title, s."basePrice",
-        p.id as "providerId", p."businessName", p.phone, p.lat, p.lng
+        p.id as "providerId", p."businessName", u.phone, p.lat, p.lng
       FROM "Service" s
       JOIN "Provider" p ON s."providerId" = p.id
+      JOIN "User" u ON p."userId" = u.id
       WHERE s.category = 'AMBULANCE' 
       AND s."isActive" = true
       AND p.lat IS NOT NULL 
@@ -22,10 +23,16 @@ export class AmbulanceService {
   }
 
   // Request an ambulance directly from home
-  async requestEmergencyAmbulance(customerId: string, serviceId: string, lat: number, lng: number, address: string) {
+  async requestEmergencyAmbulance(
+    customerId: string,
+    serviceId: string,
+    lat: number,
+    lng: number,
+    address: string,
+  ) {
     // Fetch the service to get base price
     const service = await this.prisma.service.findUnique({
-      where: { id: serviceId }
+      where: { id: serviceId },
     });
 
     if (!service) {
@@ -42,13 +49,13 @@ export class AmbulanceService {
         address,
         totalAmount: service.basePrice || 0,
         status: 'PENDING',
-        problemDetails: 'EMERGENCY_AMBULANCE_REQUEST'
+        problemDetails: 'EMERGENCY_AMBULANCE_REQUEST',
       },
       include: {
         service: {
-          include: { provider: true }
-        }
-      }
+          include: { provider: true },
+        },
+      },
     });
   }
 
@@ -59,10 +66,10 @@ export class AmbulanceService {
         provider: {
           include: {
             reviews: true,
-            user: { select: { name: true, phone: true } }
-          }
-        }
-      }
+            user: { select: { name: true, phone: true } },
+          },
+        },
+      },
     });
     if (!service) {
       throw new NotFoundException('Ambulance service not found');
@@ -74,12 +81,12 @@ export class AmbulanceService {
     return this.prisma.booking.findMany({
       where: {
         customerId,
-        service: { category: 'AMBULANCE' }
+        service: { category: 'AMBULANCE' },
       },
       include: {
-        service: { include: { provider: true } }
+        service: { include: { provider: true } },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 }

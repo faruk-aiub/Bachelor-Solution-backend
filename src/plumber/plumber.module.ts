@@ -4,6 +4,6 @@ import { PlumberController } from './plumber.controller';
 
 @Module({
   providers: [PlumberService],
-  controllers: [PlumberController]
+  controllers: [PlumberController],
 })
 export class PlumberModule {}

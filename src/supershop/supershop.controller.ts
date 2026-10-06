@@ -1,5 +1,18 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, UseInterceptors, Post, Patch, Delete, Body, Param, UseGuards, Request, UnauthorizedException, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseInterceptors,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+  UnauthorizedException,
+  Query,
+} from '@nestjs/common';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { SupershopService } from './supershop.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -12,10 +25,7 @@ export class SupershopController {
   @ApiOperation({ summary: 'Get nearby shops' })
   @UseInterceptors(CacheInterceptor)
   @Get('nearby')
-  getNearbyShops(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  getNearbyShops(@Query('page') page?: string, @Query('limit') limit?: string) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
     return this.supershopService.getNearbyShops(pageNum, limitNum);
@@ -62,17 +72,18 @@ export class SupershopController {
   ) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
-    return this.supershopService.getCustomerOrders(req.user.userId, pageNum, limitNum);
+    return this.supershopService.getCustomerOrders(
+      req.user.userId,
+      pageNum,
+      limitNum,
+    );
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Cancel my pending order' })
   @Delete('my-orders/:id')
-  cancelMyOrder(
-    @Request() req: any,
-    @Param('id') orderId: string,
-  ) {
+  cancelMyOrder(@Request() req: any, @Param('id') orderId: string) {
     return this.supershopService.cancelCustomerOrder(orderId, req.user.userId);
   }
 
@@ -80,10 +91,7 @@ export class SupershopController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Register shop' })
   @Post('register')
-  registerShop(
-    @Request() req: any,
-    @Body() data: any,
-  ) {
+  registerShop(@Request() req: any, @Body() data: any) {
     return this.supershopService.registerShop(req.user.userId, data);
   }
 
@@ -99,10 +107,7 @@ export class SupershopController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update shop info' })
   @Patch('me')
-  updateShop(
-    @Request() req: any,
-    @Body() data: any,
-  ) {
+  updateShop(@Request() req: any, @Body() data: any) {
     return this.supershopService.updateShop(req.user.userId, data);
   }
 
@@ -110,10 +115,7 @@ export class SupershopController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Add product' })
   @Post('products')
-  addProduct(
-    @Request() req: any,
-    @Body() data: any,
-  ) {
+  addProduct(@Request() req: any, @Body() data: any) {
     return this.supershopService.addProduct(req.user.userId, data);
   }
 
@@ -127,10 +129,15 @@ export class SupershopController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    if (req.user.role !== 'PROVIDER') throw new UnauthorizedException('Only providers can view orders');
+    if (req.user.role !== 'PROVIDER')
+      throw new UnauthorizedException('Only providers can view orders');
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
-    return this.supershopService.getShopOrders(req.user.userId, pageNum, limitNum);
+    return this.supershopService.getShopOrders(
+      req.user.userId,
+      pageNum,
+      limitNum,
+    );
   }
 
   @ApiBearerAuth()
@@ -142,7 +149,11 @@ export class SupershopController {
     @Param('id') orderId: string,
     @Body('status') status: any, // BookingStatus enum
   ) {
-    return this.supershopService.updateOrderStatus(orderId, req.user.userId, status);
+    return this.supershopService.updateOrderStatus(
+      orderId,
+      req.user.userId,
+      status,
+    );
   }
 
   @ApiBearerAuth()
@@ -154,17 +165,18 @@ export class SupershopController {
     @Param('id') productId: string,
     @Body() data: any,
   ) {
-    return this.supershopService.updateProduct(req.user.userId, productId, data);
+    return this.supershopService.updateProduct(
+      req.user.userId,
+      productId,
+      data,
+    );
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete product' })
   @Delete('products/:id')
-  deleteProduct(
-    @Request() req: any,
-    @Param('id') productId: string,
-  ) {
+  deleteProduct(@Request() req: any, @Param('id') productId: string) {
     return this.supershopService.deleteProduct(req.user.userId, productId);
   }
 }

@@ -1,5 +1,19 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, UseInterceptors, Post, Patch, Body, Query, Param, UseGuards, Request, UnauthorizedException, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseInterceptors,
+  Post,
+  Patch,
+  Body,
+  Query,
+  Param,
+  UseGuards,
+  Request,
+  UnauthorizedException,
+  Delete,
+} from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { JobsService } from './jobs.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -9,6 +23,7 @@ export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @ApiOperation({ summary: 'Get all jobs' })
+  @UseInterceptors(CacheInterceptor)
   @Get()
   getAllJobs(
     @Query('type') type?: string,
@@ -24,10 +39,7 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create job posting' })
   @Post()
-  createJobPosting(
-    @Request() req: any,
-    @Body() data: any
-  ) {
+  createJobPosting(@Request() req: any, @Body() data: any) {
     return this.jobsService.createJobPosting(req.user.userId, data);
   }
 
@@ -35,10 +47,7 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Apply for job' })
   @Post('apply')
-  applyForJob(
-    @Request() req: any,
-    @Body('jobId') jobId: string,
-  ) {
+  applyForJob(@Request() req: any, @Body('jobId') jobId: string) {
     return this.jobsService.applyForJob(jobId, req.user.userId);
   }
 
@@ -69,10 +78,7 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get applicants' })
   @Get(':jobId/applicants')
-  getApplicants(
-    @Request() req: any,
-    @Param('jobId') jobId: string,
-  ) {
+  getApplicants(@Request() req: any, @Param('jobId') jobId: string) {
     // In a real app, verify that req.user.userId is the owner of this job posting
     return this.jobsService.getApplicants(jobId);
   }
@@ -93,10 +99,7 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Withdraw job application' })
   @Delete('applications/:id')
-  withdrawApplication(
-    @Request() req: any,
-    @Param('id') applicationId: string,
-  ) {
+  withdrawApplication(@Request() req: any, @Param('id') applicationId: string) {
     return this.jobsService.withdrawApplication(applicationId, req.user.userId);
   }
 
@@ -122,10 +125,7 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete job posting' })
   @Delete(':id')
-  deleteJobPosting(
-    @Request() req: any,
-    @Param('id') jobId: string,
-  ) {
+  deleteJobPosting(@Request() req: any, @Param('id') jobId: string) {
     return this.jobsService.deleteJobPosting(req.user.userId, jobId);
   }
 }

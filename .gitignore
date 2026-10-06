@@ -66,3 +66,30 @@ a_list_b.md
 *.sqlite
 *.sqlite3
 *.db
+
+# User Uploads
+/uploads
+uploads/
+
+# Firebase & Service Account Keys
+*serviceAccount*.json
+*firebase*.json
+*-secret.json
+*-key.json
+credentials.json
+
+# Docker Data Volumes
+postgres-data/
+docker-data/
+db-data/
+
+# Other OS files
+Thumbs.db
+ehthumbs.db
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor temp files
+*.swp
+*~

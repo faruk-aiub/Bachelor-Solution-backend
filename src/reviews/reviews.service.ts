@@ -9,12 +9,19 @@ export class ReviewsService {
     return this.prisma.review.findMany({
       where: { providerId: providerId ? providerId : undefined },
       orderBy: { createdAt: 'desc' },
-      include: { author: { select: { name: true, profilePhoto: true } } }
+      include: { author: { select: { name: true, profilePhoto: true } } },
     });
   }
 
-  async addReview(providerId: string, authorId: string, rating: number, comment: string) {
-    const provider = await this.prisma.provider.findUnique({ where: { id: providerId } });
+  async addReview(
+    providerId: string,
+    authorId: string,
+    rating: number,
+    comment: string,
+  ) {
+    const provider = await this.prisma.provider.findUnique({
+      where: { id: providerId },
+    });
     if (!provider) throw new NotFoundException('Provider not found');
 
     return this.prisma.review.create({
@@ -22,28 +29,33 @@ export class ReviewsService {
         providerId,
         authorId,
         rating,
-        comment
-      }
+        comment,
+      },
     });
   }
 
   async getReviewById(id: string) {
     return this.prisma.review.findUnique({
       where: { id },
-      include: { author: { select: { name: true, profilePhoto: true } } }
+      include: { author: { select: { name: true, profilePhoto: true } } },
     });
   }
 
-  async updateReview(id: string, authorId: string, rating: number, comment: string) {
+  async updateReview(
+    id: string,
+    authorId: string,
+    rating: number,
+    comment: string,
+  ) {
     return this.prisma.review.updateMany({
       where: { id, authorId },
-      data: { rating, comment }
+      data: { rating, comment },
     });
   }
 
   async deleteReview(id: string, authorId: string) {
     return this.prisma.review.deleteMany({
-      where: { id, authorId }
+      where: { id, authorId },
     });
   }
 }

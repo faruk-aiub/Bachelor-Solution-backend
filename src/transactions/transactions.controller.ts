@@ -1,12 +1,21 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Body, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Transactions')
 @Controller('api/v1/transactions')
 @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
@@ -30,7 +39,12 @@ export class TransactionsController {
     @Body('purpose') purpose: string,
     @Body('gateway') gateway?: string,
   ) {
-    return this.transactionsService.initiatePayment(req.user.userId, amount, purpose, gateway);
+    return this.transactionsService.initiatePayment(
+      req.user.userId,
+      amount,
+      purpose,
+      gateway,
+    );
   }
 
   @ApiOperation({ summary: 'Update payment status (Webhook)' })

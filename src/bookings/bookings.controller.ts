@@ -1,12 +1,23 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  Request,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Bookings')
 @Controller('api/v1/bookings')
 @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
@@ -20,7 +31,14 @@ export class BookingsController {
     @Body('lng') lng?: number,
     @Body('address') address?: string,
   ) {
-    return this.bookingsService.createBooking(req.user.userId, serviceId, totalAmount, lat, lng, address);
+    return this.bookingsService.createBooking(
+      req.user.userId,
+      serviceId,
+      totalAmount,
+      lat,
+      lng,
+      address,
+    );
   }
 
   @ApiOperation({ summary: 'Get customer bookings' })
@@ -32,7 +50,11 @@ export class BookingsController {
   ) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
-    return this.bookingsService.getCustomerBookings(req.user.userId, pageNum, limitNum);
+    return this.bookingsService.getCustomerBookings(
+      req.user.userId,
+      pageNum,
+      limitNum,
+    );
   }
 
   @ApiOperation({ summary: 'Get provider bookings' })
@@ -45,15 +67,16 @@ export class BookingsController {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
     // Requires provider ID, simplified here assuming userId is providerId
-    return this.bookingsService.getProviderBookings(req.user.userId, pageNum, limitNum);
+    return this.bookingsService.getProviderBookings(
+      req.user.userId,
+      pageNum,
+      limitNum,
+    );
   }
 
   @ApiOperation({ summary: 'Update status' })
   @Patch(':id/status')
-  updateStatus(
-    @Param('id') bookingId: string,
-    @Body('status') status: any,
-  ) {
+  updateStatus(@Param('id') bookingId: string, @Body('status') status: any) {
     return this.bookingsService.updateBookingStatus(bookingId, status);
   }
 
@@ -65,10 +88,7 @@ export class BookingsController {
 
   @ApiOperation({ summary: 'Cancel booking' })
   @Delete(':id')
-  cancelBooking(
-    @Request() req: any,
-    @Param('id') id: string
-  ) {
+  cancelBooking(@Request() req: any, @Param('id') id: string) {
     return this.bookingsService.cancelBooking(id, req.user.userId);
   }
 }

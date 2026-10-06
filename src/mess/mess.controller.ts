@@ -1,12 +1,22 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { MessService } from './mess.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Mess')
 @Controller('api/v1/mess')
 @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class MessController {
   constructor(private readonly messService: MessService) {}
 
@@ -28,10 +38,7 @@ export class MessController {
 
   @ApiOperation({ summary: 'Join mess' })
   @Post(':messId/join')
-  joinMess(
-    @Request() req: any,
-    @Param('messId') messId: string,
-  ) {
+  joinMess(@Request() req: any, @Param('messId') messId: string) {
     return this.messService.joinMess(messId, req.user.userId);
   }
 
@@ -81,20 +88,13 @@ export class MessController {
 
   @ApiOperation({ summary: 'Update mess details' })
   @Patch(':id')
-  updateMess(
-    @Request() req: any,
-    @Param('id') id: string,
-    @Body() data: any,
-  ) {
+  updateMess(@Request() req: any, @Param('id') id: string, @Body() data: any) {
     return this.messService.updateMess(req.user.userId, id, data);
   }
 
   @ApiOperation({ summary: 'Delete mess' })
   @Delete(':id')
-  deleteMess(
-    @Request() req: any,
-    @Param('id') id: string,
-  ) {
+  deleteMess(@Request() req: any, @Param('id') id: string) {
     return this.messService.deleteMess(req.user.userId, id);
   }
 
@@ -106,28 +106,19 @@ export class MessController {
 
   @ApiOperation({ summary: 'Remove member' })
   @Delete('member/:memberId')
-  removeMember(
-    @Request() req: any,
-    @Param('memberId') memberId: string
-  ) {
+  removeMember(@Request() req: any, @Param('memberId') memberId: string) {
     return this.messService.removeMember(req.user.userId, memberId);
   }
 
   @ApiOperation({ summary: 'Delete meal' })
   @Delete('meals/:id')
-  deleteMeal(
-    @Request() req: any,
-    @Param('id') mealId: string,
-  ) {
+  deleteMeal(@Request() req: any, @Param('id') mealId: string) {
     return this.messService.deleteMeal(req.user.userId, mealId);
   }
 
   @ApiOperation({ summary: 'Delete expense' })
   @Delete('expenses/:id')
-  deleteExpense(
-    @Request() req: any,
-    @Param('id') expenseId: string,
-  ) {
+  deleteExpense(@Request() req: any, @Param('id') expenseId: string) {
     return this.messService.deleteExpense(req.user.userId, expenseId);
   }
 }

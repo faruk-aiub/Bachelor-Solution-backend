@@ -6,7 +6,14 @@ import { BookingStatus } from '@prisma/client';
 export class BookingsService {
   constructor(private prisma: PrismaService) {}
 
-  async createBooking(customerId: string, serviceId: string, totalAmount: number, lat?: number, lng?: number, address?: string) {
+  async createBooking(
+    customerId: string,
+    serviceId: string,
+    totalAmount: number,
+    lat?: number,
+    lng?: number,
+    address?: string,
+  ) {
     return this.prisma.booking.create({
       data: {
         customerId,
@@ -15,23 +22,27 @@ export class BookingsService {
         lat,
         lng,
         address,
-        status: BookingStatus.PENDING
+        status: BookingStatus.PENDING,
       },
       include: {
         service: true,
-        customer: { select: { id: true, name: true, phone: true } }
-      }
+        customer: { select: { id: true, name: true, phone: true } },
+      },
     });
   }
 
   async updateBookingStatus(id: string, status: BookingStatus) {
     return this.prisma.booking.update({
       where: { id },
-      data: { status }
+      data: { status },
     });
   }
 
-  async getCustomerBookings(customerId: string, page: number = 1, limit: number = 20) {
+  async getCustomerBookings(
+    customerId: string,
+    page: number = 1,
+    limit: number = 20,
+  ) {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
       this.prisma.booking.findMany({
@@ -41,12 +52,19 @@ export class BookingsService {
         skip,
         take: limit,
       }),
-      this.prisma.booking.count({ where: { customerId } })
+      this.prisma.booking.count({ where: { customerId } }),
     ]);
-    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
-  async getProviderBookings(providerId: string, page: number = 1, limit: number = 20) {
+  async getProviderBookings(
+    providerId: string,
+    page: number = 1,
+    limit: number = 20,
+  ) {
     const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
       this.prisma.booking.findMany({
@@ -56,22 +74,30 @@ export class BookingsService {
         skip,
         take: limit,
       }),
-      this.prisma.booking.count({ where: { service: { providerId } } })
+      this.prisma.booking.count({ where: { service: { providerId } } }),
     ]);
-    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async getBookingById(id: string) {
     return this.prisma.booking.findUnique({
       where: { id },
-      include: { service: true, customer: { select: { id: true, name: true, phone: true } } }
+      include: {
+        service: true,
+        customer: { select: { id: true, name: true, phone: true } },
+      },
     });
   }
 
   async cancelBooking(id: string, customerId: string) {
     const booking = await this.prisma.booking.findUnique({ where: { id } });
     if (!booking || booking.customerId !== customerId) {
-      throw new Error('Booking not found or you are not authorized to cancel it');
+      throw new Error(
+        'Booking not found or you are not authorized to cancel it',
+      );
     }
     return this.prisma.booking.delete({ where: { id } });
   }

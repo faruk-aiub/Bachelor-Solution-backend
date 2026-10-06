@@ -1,5 +1,14 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Query, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AmbulanceService } from './ambulance.service';
 
@@ -17,7 +26,7 @@ export class AmbulanceController {
     return this.ambulanceService.findNearbyAmbulances(
       parseFloat(lat),
       parseFloat(lng),
-      parseFloat(radius)
+      parseFloat(radius),
     );
   }
 
@@ -34,7 +43,7 @@ export class AmbulanceController {
       serviceId,
       lat,
       lng,
-      address
+      address,
     );
   }
 

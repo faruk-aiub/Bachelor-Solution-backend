@@ -1,5 +1,13 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, UseGuards, Request, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Patch,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
@@ -29,15 +37,16 @@ export class AuthController {
     @Body('oldPassword') oldPassword: string,
     @Body('newPassword') newPassword: string,
   ) {
-    return this.authService.changePassword(req.user.userId, oldPassword, newPassword);
+    return this.authService.changePassword(
+      req.user.userId,
+      oldPassword,
+      newPassword,
+    );
   }
 
   @ApiOperation({ summary: 'Verify OTP' })
   @Post('verify-otp')
-  verifyOtp(
-    @Body('phone') phone: string,
-    @Body('otp') otp: string
-  ) {
+  verifyOtp(@Body('phone') phone: string, @Body('otp') otp: string) {
     return this.authService.verifyOtp(phone, otp);
   }
 

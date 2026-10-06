@@ -4,6 +4,6 @@ import { MaidController } from './maid.controller';
 
 @Module({
   providers: [MaidService],
-  controllers: [MaidController]
+  controllers: [MaidController],
 })
 export class MaidModule {}

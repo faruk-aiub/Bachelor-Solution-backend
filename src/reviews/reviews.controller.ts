@@ -1,5 +1,16 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Body, UseGuards, Request, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  UseGuards,
+  Request,
+  Query,
+  Param,
+} from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -24,7 +35,12 @@ export class ReviewsController {
     @Body('rating') rating: number,
     @Body('comment') comment: string,
   ) {
-    return this.reviewsService.addReview(providerId, req.user.userId, rating, comment);
+    return this.reviewsService.addReview(
+      providerId,
+      req.user.userId,
+      rating,
+      comment,
+    );
   }
 
   @ApiOperation({ summary: 'Get single review' })
@@ -43,17 +59,19 @@ export class ReviewsController {
     @Body('rating') rating: number,
     @Body('comment') comment: string,
   ) {
-    return this.reviewsService.updateReview(id, req.user.userId, rating, comment);
+    return this.reviewsService.updateReview(
+      id,
+      req.user.userId,
+      rating,
+      comment,
+    );
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete review' })
   @Delete(':id')
-  deleteReview(
-    @Request() req: any,
-    @Param('id') id: string,
-  ) {
+  deleteReview(@Request() req: any, @Param('id') id: string) {
     return this.reviewsService.deleteReview(id, req.user.userId);
   }
 }

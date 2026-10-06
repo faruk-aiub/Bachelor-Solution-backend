@@ -1,5 +1,15 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Query, UseGuards, Request, Param, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  UseGuards,
+  Request,
+  Param,
+  Patch,
+} from '@nestjs/common';
 import { MaidService } from './maid.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -10,13 +20,10 @@ export class MaidController {
 
   @ApiOperation({ summary: 'Get available maids' })
   @Get('available')
-  getAvailableMaids(
-    @Query('lat') lat?: string,
-    @Query('lng') lng?: string
-  ) {
+  getAvailableMaids(@Query('lat') lat?: string, @Query('lng') lng?: string) {
     return this.maidService.getAvailableMaids(
-      lat ? parseFloat(lat) : undefined, 
-      lng ? parseFloat(lng) : undefined
+      lat ? parseFloat(lat) : undefined,
+      lng ? parseFloat(lng) : undefined,
     );
   }
 
@@ -36,7 +43,7 @@ export class MaidController {
       serviceId,
       address,
       new Date(date),
-      instructions
+      instructions,
     );
   }
 
@@ -69,7 +76,7 @@ export class MaidController {
   updateJobStatus(
     @Request() req: any,
     @Param('id') id: string,
-    @Body('status') status: any
+    @Body('status') status: any,
   ) {
     return this.maidService.updateJobStatus(id, status, req.user.userId);
   }
@@ -78,10 +85,7 @@ export class MaidController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Toggle availability (Provider)' })
   @Patch('provider/availability')
-  toggleAvailability(
-    @Request() req: any,
-    @Body('isActive') isActive: boolean
-  ) {
+  toggleAvailability(@Request() req: any, @Body('isActive') isActive: boolean) {
     return this.maidService.toggleAvailability(req.user.userId, isActive);
   }
 }

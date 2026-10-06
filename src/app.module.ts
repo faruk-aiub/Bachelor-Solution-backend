@@ -26,20 +26,50 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { UploadsModule } from './uploads/uploads.module';
 import { CacheModule } from '@nestjs/cache-manager';
-
+import { ScheduleModule } from '@nestjs/schedule';
+import { FirebaseModule } from './firebase/firebase.module';
+import { CronModule } from './cron/cron.module';
+import { EventsModule } from './events/events.module';
 @Module({
   imports: [
     // Rate Limiting Config (e.g. max 100 requests per 60 seconds per IP)
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     // In-memory caching globally
     CacheModule.register({
       isGlobal: true,
       ttl: 60000, // default ttl 60 seconds
     }),
-    PrismaModule, AuthModule, UsersModule, ProvidersModule, ServicesModule, MessModule, SupershopModule, BookingsModule, TransactionsModule, MarketplaceModule, JobsModule, ReviewsModule, NotificationsModule, HousingModule, AdminModule, SupportModule, LearningModule, AmbulanceModule, MaidModule, PlumberModule, UploadsModule
+    // Background Jobs (Cron)
+    ScheduleModule.forRoot(),
+    PrismaModule,
+    AuthModule,
+    UsersModule,
+    ProvidersModule,
+    ServicesModule,
+    MessModule,
+    SupershopModule,
+    BookingsModule,
+    TransactionsModule,
+    MarketplaceModule,
+    JobsModule,
+    ReviewsModule,
+    NotificationsModule,
+    HousingModule,
+    AdminModule,
+    SupportModule,
+    LearningModule,
+    AmbulanceModule,
+    MaidModule,
+    PlumberModule,
+    UploadsModule,
+    CronModule,
+    EventsModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [

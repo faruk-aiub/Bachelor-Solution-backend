@@ -20,7 +20,12 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect({
+        name: 'Bachelor Solution API',
+        version: '1.0.0',
+        status: '🚀 Running perfectly!',
+        docs: '/api-docs',
+      });
   });
 
   afterEach(async () => {

@@ -10,15 +10,15 @@ export class SupportService {
       data: {
         userId,
         subject,
-        description
-      }
+        description,
+      },
     });
   }
 
   async getUserTickets(userId: string) {
     return this.prisma.supportTicket.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -26,19 +26,19 @@ export class SupportService {
   async resolveTicket(ticketId: string) {
     return this.prisma.supportTicket.update({
       where: { id: ticketId },
-      data: { status: 'RESOLVED' }
+      data: { status: 'RESOLVED' },
     });
   }
 
   async getTicketById(id: string) {
     return this.prisma.supportTicket.findUnique({
-      where: { id }
+      where: { id },
     });
   }
 
   async deleteTicket(id: string) {
     return this.prisma.supportTicket.delete({
-      where: { id }
+      where: { id },
     });
   }
 }

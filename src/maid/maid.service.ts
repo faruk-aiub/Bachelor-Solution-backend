@@ -11,15 +11,27 @@ export class MaidService {
     return this.prisma.service.findMany({
       where: {
         category: 'MAID',
-        isActive: true
+        isActive: true,
       },
-      include: { provider: { select: { businessName: true, address: true, lat: true, lng: true } } }
+      include: {
+        provider: {
+          select: { businessName: true, address: true, lat: true, lng: true },
+        },
+      },
     });
   }
 
-  async bookMaid(customerId: string, serviceId: string, address: string, date: Date, instructions?: string) {
-    const service = await this.prisma.service.findUnique({ where: { id: serviceId } });
-    
+  async bookMaid(
+    customerId: string,
+    serviceId: string,
+    address: string,
+    date: Date,
+    instructions?: string,
+  ) {
+    const service = await this.prisma.service.findUnique({
+      where: { id: serviceId },
+    });
+
     if (!service) throw new NotFoundException('Maid service not found');
 
     return this.prisma.booking.create({
@@ -29,8 +41,8 @@ export class MaidService {
         totalAmount: service.basePrice || 0,
         address,
         problemDetails: `Preferred Date: ${date.toISOString()}. ${instructions || ''}`,
-        status: 'PENDING'
-      }
+        status: 'PENDING',
+      },
     });
   }
 
@@ -41,10 +53,10 @@ export class MaidService {
         provider: {
           include: {
             reviews: true,
-            user: { select: { name: true, phone: true } }
-          }
-        }
-      }
+            user: { select: { name: true, phone: true } },
+          },
+        },
+      },
     });
     if (!service) throw new NotFoundException('Maid service not found');
     return service;
@@ -54,12 +66,12 @@ export class MaidService {
     return this.prisma.booking.findMany({
       where: {
         customerId,
-        service: { category: 'MAID' }
+        service: { category: 'MAID' },
       },
       include: {
-        service: { include: { provider: true } }
+        service: { include: { provider: true } },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -68,43 +80,46 @@ export class MaidService {
       where: {
         service: {
           provider: { userId },
-          category: 'MAID'
-        }
+          category: 'MAID',
+        },
       },
       include: {
         customer: { select: { name: true, phone: true } },
-        service: true
+        service: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async updateJobStatus(bookingId: string, status: any, userId: string) {
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { service: { include: { provider: true } } }
+      include: { service: { include: { provider: true } } },
     });
     if (!booking || booking.service.provider.userId !== userId) {
       throw new NotFoundException('Booking not found or unauthorized');
     }
     return this.prisma.booking.update({
       where: { id: bookingId },
-      data: { status }
+      data: { status },
     });
   }
 
   async toggleAvailability(userId: string, isActive: boolean) {
-    const provider = await this.prisma.provider.findUnique({ where: { userId } });
-    if (!provider) throw new NotFoundException('Provider profile not found');
-    
-    const service = await this.prisma.service.findFirst({
-      where: { providerId: provider.id, category: 'MAID' }
+    const provider = await this.prisma.provider.findUnique({
+      where: { userId },
     });
-    if (!service) throw new NotFoundException('Maid service not found for this provider');
+    if (!provider) throw new NotFoundException('Provider profile not found');
+
+    const service = await this.prisma.service.findFirst({
+      where: { providerId: provider.id, category: 'MAID' },
+    });
+    if (!service)
+      throw new NotFoundException('Maid service not found for this provider');
 
     return this.prisma.service.update({
       where: { id: service.id },
-      data: { isActive }
+      data: { isActive },
     });
   }
 }

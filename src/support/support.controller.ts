@@ -1,12 +1,22 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Body, UseGuards, Request, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  UseGuards,
+  Request,
+  Param,
+} from '@nestjs/common';
 import { SupportService } from './support.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Support')
 @Controller('api/v1/support')
 @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class SupportController {
   constructor(private readonly supportService: SupportService) {}
 
@@ -23,7 +33,11 @@ export class SupportController {
     @Body('subject') subject: string,
     @Body('description') description: string,
   ) {
-    return this.supportService.createTicket(req.user.userId, subject, description);
+    return this.supportService.createTicket(
+      req.user.userId,
+      subject,
+      description,
+    );
   }
 
   @ApiOperation({ summary: 'Get single ticket' })

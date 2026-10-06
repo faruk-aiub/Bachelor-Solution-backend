@@ -1,5 +1,16 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, UseInterceptors, Post, Patch, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseInterceptors,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -7,7 +18,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 @ApiTags('Admin')
 @Controller('api/v1/admin')
 @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 // In a real app, you would add a @Roles('ADMIN') guard here
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
@@ -40,10 +51,7 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Get all bookings (Admin)' })
   @Get('bookings')
-  getAllBookings(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  getAllBookings(@Query('page') page?: string, @Query('limit') limit?: string) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
     return this.adminService.getAllBookings(pageNum, limitNum);
@@ -51,10 +59,7 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Get all users (Admin)' })
   @Get('users')
-  getAllUsers(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  getAllUsers(@Query('page') page?: string, @Query('limit') limit?: string) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
     return this.adminService.getAllUsers(pageNum, limitNum);
@@ -114,10 +119,7 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Update user role (Admin)' })
   @Patch('users/:id/role')
-  updateUserRole(
-    @Param('id') id: string,
-    @Body('role') role: string
-  ) {
+  updateUserRole(@Param('id') id: string, @Body('role') role: string) {
     // Assuming role comes as a valid string value for the Role enum
     return this.adminService.updateUserRole(id, role as any);
   }
@@ -137,7 +139,7 @@ export class AdminController {
   @Patch('support-tickets/:id/status')
   updateSupportTicketStatus(
     @Param('id') id: string,
-    @Body('status') status: string
+    @Body('status') status: string,
   ) {
     return this.adminService.updateSupportTicketStatus(id, status);
   }
@@ -146,7 +148,7 @@ export class AdminController {
   @Patch('transactions/:id/status')
   updateTransactionStatus(
     @Param('id') id: string,
-    @Body('status') status: string
+    @Body('status') status: string,
   ) {
     return this.adminService.updateTransactionStatus(id, status as any);
   }
@@ -165,37 +167,25 @@ export class AdminController {
 
   @ApiOperation({ summary: 'Update provider details manually (Admin)' })
   @Patch('providers/:id')
-  updateProviderDetails(
-    @Param('id') id: string,
-    @Body() data: any
-  ) {
+  updateProviderDetails(@Param('id') id: string, @Body() data: any) {
     return this.adminService.updateProviderDetails(id, data);
   }
 
   @ApiOperation({ summary: 'Update a booking status manually (Admin)' })
   @Patch('bookings/:id/status')
-  updateBookingStatus(
-    @Param('id') id: string,
-    @Body('status') status: string
-  ) {
+  updateBookingStatus(@Param('id') id: string, @Body('status') status: string) {
     return this.adminService.updateBookingStatus(id, status as any);
   }
 
   @ApiOperation({ summary: 'Update a supershop order status manually (Admin)' })
   @Patch('orders/:id/status')
-  updateOrderStatus(
-    @Param('id') id: string,
-    @Body('status') status: string
-  ) {
+  updateOrderStatus(@Param('id') id: string, @Body('status') status: string) {
     return this.adminService.updateOrderStatus(id, status as any);
   }
 
   @ApiOperation({ summary: 'Get all supershop orders' })
   @Get('orders')
-  getAllOrders(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  getAllOrders(@Query('page') page?: string, @Query('limit') limit?: string) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
     return this.adminService.getAllOrders(pageNum, limitNum);
@@ -205,7 +195,7 @@ export class AdminController {
   @Post('broadcast')
   broadcastNotification(
     @Body('title') title: string,
-    @Body('message') message: string
+    @Body('message') message: string,
   ) {
     return this.adminService.broadcastNotification(title, message);
   }

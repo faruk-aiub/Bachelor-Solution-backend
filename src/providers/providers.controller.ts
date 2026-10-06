@@ -1,5 +1,15 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ProvidersService } from './providers.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -24,10 +34,7 @@ export class ProvidersController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Register provider' })
   @Post('register')
-  registerProvider(
-    @Request() req: any,
-    @Body() data: any,
-  ) {
+  registerProvider(@Request() req: any, @Body() data: any) {
     return this.providersService.createProvider(req.user.userId, data);
   }
 

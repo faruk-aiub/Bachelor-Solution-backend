@@ -1,5 +1,17 @@
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { Controller, Get, UseInterceptors, Post, Patch, Delete, Body, Query, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseInterceptors,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Query,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { HousingService } from './housing.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -22,7 +34,13 @@ export class HousingController {
   ) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
-    return this.housingService.searchHousing(type, location, maxRent ? parseFloat(maxRent) : undefined, pageNum, limitNum);
+    return this.housingService.searchHousing(
+      type,
+      location,
+      maxRent ? parseFloat(maxRent) : undefined,
+      pageNum,
+      limitNum,
+    );
   }
 
   @ApiBearerAuth()
@@ -36,17 +54,18 @@ export class HousingController {
   ) {
     const pageNum = page ? parseInt(page) : 1;
     const limitNum = limit ? parseInt(limit) : 20;
-    return this.housingService.getMyListings(req.user.userId, pageNum, limitNum);
+    return this.housingService.getMyListings(
+      req.user.userId,
+      pageNum,
+      limitNum,
+    );
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create listing' })
   @Post()
-  createListing(
-    @Request() req: any,
-    @Body() data: any,
-  ) {
+  createListing(@Request() req: any, @Body() data: any) {
     return this.housingService.createListing(req.user.userId, data);
   }
 
@@ -59,7 +78,11 @@ export class HousingController {
     @Param('id') listingId: string,
     @Body('isAvailable') isAvailable: boolean,
   ) {
-    return this.housingService.updateAvailability(listingId, req.user.userId, isAvailable);
+    return this.housingService.updateAvailability(
+      listingId,
+      req.user.userId,
+      isAvailable,
+    );
   }
 
   @ApiBearerAuth()
@@ -78,10 +101,7 @@ export class HousingController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete listing' })
   @Delete(':id')
-  deleteListing(
-    @Request() req: any,
-    @Param('id') listingId: string,
-  ) {
+  deleteListing(@Request() req: any, @Param('id') listingId: string) {
     return this.housingService.deleteListing(listingId, req.user.userId);
   }
 

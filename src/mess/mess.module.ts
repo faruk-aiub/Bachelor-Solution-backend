@@ -4,6 +4,6 @@ import { MessController } from './mess.controller';
 
 @Module({
   providers: [MessService],
-  controllers: [MessController]
+  controllers: [MessController],
 })
 export class MessModule {}
